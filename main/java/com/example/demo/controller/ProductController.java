@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.demo.entity.Product;
 import com.example.demo.service.ProductService;
 
+//random comment to test git
 @RestController
 public class ProductController {
 	
