@@ -1,0 +1,83 @@
+
+<p-toast></p-toast>
+
+<div class="card">
+    <p-toolbar styleClass="p-mb-4">
+        <ng-template pTemplate="left">
+            <button pButton pRipple label="New" icon="pi pi-plus" class="p-button-success p-mr-2" (click)="openNew()"></button>
+            <button pButton pRipple [label]="Delete" icon="pi pi-trash" class="p-button-danger" (click)="deleteSelectedlayers()" [disabled]="!selectedlayers || !selectedlayers.length"></button>
+        </ng-template>
+    </p-toolbar>
+
+    <p-table #dt [value]="layers" [rows]="10" [paginator]="true" [globalFilterFields]="['name','country.name','representative.name','status']"
+        [(selection)]="selectedLayers" [rowHover]="true" dataKey="id"
+        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries" [showCurrentPageReport]="true">
+        <ng-template pTemplate="caption">
+            <div class="p-d-flex p-ai-center p-jc-between">
+                <h5 class="p-m-0">Manage layers</h5>
+                <span class="p-input-icon-left">
+                    <i class="pi pi-search"></i>
+                    <input pInputText type="text" (input)="dt.filterGlobal($event.target.value, 'contains')"/>
+                </span>
+            </div>
+        </ng-template>
+        <ng-template pTemplate="header">
+            <tr>
+                <th style="width: 3rem">
+                    <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+                </th>
+                <th pSortableColumn="name">Name<p-sortIcon field="name"></p-sortIcon></th>
+                <th pSortableColumn="fileType">File Type<p-sortIcon field="fileType"></p-sortIcon></th>
+                <th pSortableColumn="size">Size<p-sortIcon field="size"></p-sortIcon></th>
+                <th></th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-layer>
+            <tr>
+                <td>
+                    <p-tableCheckbox [value]="layer"></p-tableCheckbox>
+                </td>
+                <td>{{layer.name}}</td>
+                <td>{{layer.fileType}}</td>
+                <td>{{layer.size}}</td>
+                <td>
+                    <button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-success p-mr-2" (click)="editLayer(layer)"></button>
+                    <button pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-warning" (click)="deleteLayer(layer)"></button>
+                </td>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="summary">
+            <div class="p-d-flex p-ai-center p-jc-between">
+                A total of {{layers ? layers.length : 0 }} layers are available to users of the Hypermap.
+            </div>
+        </ng-template>
+    </p-table>
+</div>
+
+<p-dialog [(visible)]="layerDialog" [style]="{width: '450px'}" header="Layer Details" [modal]="true" styleClass="p-fluid">
+    <ng-template pTemplate="content">
+        <div class="p-field">
+            <label for="name">Name</label>
+            <input type="text" pInputText id="name" [(ngModel)]="layer.name" required autofocus />
+            <small class="p-invalid" *ngIf="submitted && !layer.name">Name is required.</small>
+        </div>
+        <br/>
+        <div class="p-field">
+            <label for="description">Description</label>
+            <textarea id="description" pInputTextarea [(ngModel)]="layer.description" required rows="3" cols="20"></textarea>
+        </div>
+
+        <div class="p-field">
+            <div class="p-formgrid p-grid">
+                <p-fileUpload mode="basic" accept="" [maxFileSize]="1000000" label="Upload" chooseLabel="Upload" class="p-mr-2 p-d-inline-block"></p-fileUpload>
+            </div>
+        </div>
+    </ng-template>
+    
+    <ng-template pTemplate="footer">
+        <button pButton pRipple label="Cancel" icon="pi pi-times" class="p-button-text" (click)="hideDialog()"></button>
+        <button pButton pRipple label="Save" icon="pi pi-check" class="p-button-text" (click)="saveLayer()"></button>
+    </ng-template>
+</p-dialog>
+
+<p-confirmDialog [style]="{width: '450px'}"></p-confirmDialog>
