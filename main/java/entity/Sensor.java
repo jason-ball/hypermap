@@ -6,14 +6,9 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
-import lombok.Getter;
-import lombok.Setter;
 
 
 
-
-@Getter
-@Setter
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

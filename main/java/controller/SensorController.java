@@ -25,11 +25,12 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api")
 public class SensorController {
+
 	@Autowired
     private SensorRepository sensorRepository;
 	
 	@PostMapping("/Sensor")
-    public Sensor addEmployee(@RequestBody Sensor sensor) {
+    public Sensor addSensor(@RequestBody Sensor sensor) {
         return sensorRepository.save(sensor);
     }
 
