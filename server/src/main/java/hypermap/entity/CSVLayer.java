@@ -14,7 +14,6 @@ import javax.persistence.Table;
 @Table(name = "`CSVLayer`")
 public class CSVLayer extends MapLayer {
 
-    @Id
     @Column(name = "`CSVFile`")
     private String csvFile;
 }

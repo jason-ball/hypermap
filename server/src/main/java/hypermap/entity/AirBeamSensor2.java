@@ -16,7 +16,6 @@ import javax.persistence.Table;
 @Table(name = "`AirBeam2Sensor`")
 public class AirBeamSensor2 extends Sensor {
 
-    @Id
     @Column(name = "`AirBeam2ID`")
     private int airBeam2ID;
 }

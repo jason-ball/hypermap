@@ -16,7 +16,6 @@ import javax.persistence.Table;
 @Table(name = "`PurpleAirSensor`")
 public class PurpleAirSensor extends Sensor {
 
-    @Id
     @Column(name = "`PurpleAirID`")
     private int purpleAirID;
 }

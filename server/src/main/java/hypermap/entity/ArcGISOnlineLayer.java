@@ -14,7 +14,6 @@ import javax.persistence.Table;
 @Table(name = "`ArcGISOnlineLayer`")
 public class ArcGISOnlineLayer extends MapLayer {
 
-    @Id
     @Column(name = "`ArcGISOnlineID`")
     private String displayName;
 }

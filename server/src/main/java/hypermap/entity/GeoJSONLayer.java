@@ -14,7 +14,6 @@ import javax.persistence.Table;
 @Table(name = "`GeoJSONLayer`")
 public class GeoJSONLayer extends MapLayer {
 
-    @Id
     @Column(name = "`GeoJSON`")
     private String geoJSON;
 }
