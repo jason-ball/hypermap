@@ -1,4 +1,4 @@
-package controller;
+package hypermap.controller;
 
 import java.util.List;
 
@@ -13,9 +13,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import entity.Sensor;
-import exception.ResourceNotFoundException;
-import repository.SensorRepository;
+import hypermap.entity.Sensor;
+import hypermap.exception.ResourceNotFoundException;
+import hypermap.repository.SensorRepository;
 
 import org.springframework.web.bind.annotation.*;
 
