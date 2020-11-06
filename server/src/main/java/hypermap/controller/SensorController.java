@@ -3,6 +3,10 @@ package hypermap.controller;
 import java.util.List;
 
 
+import hypermap.entity.AirBeamSensor2;
+import hypermap.entity.ArcGISOnlineLayer;
+import hypermap.entity.PurpleAirSensor;
+import hypermap.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,7 +19,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import hypermap.entity.Sensor;
 import hypermap.exception.ResourceNotFoundException;
-import hypermap.repository.SensorRepository;
 
 import org.springframework.web.bind.annotation.*;
 
@@ -26,8 +29,22 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api")
 public class SensorController {
 
-	@Autowired
+    @Autowired
     private SensorRepository sensorRepository;
+    @Autowired
+    private AirBeam2SensorRepository airBeam2SensorRepository;
+    @Autowired
+    private ArcGISOnlineLayerRepository arcGISOnlineLayerRepository;
+    @Autowired
+    private CSVLayerRepository csvLayerRepository;
+    @Autowired
+    private GeoJSONLayerRepository geoJSONLayerRepository;
+    @Autowired
+    private HTTPLayerRepository httpLayerRepository;
+    @Autowired
+    private MapLayerRepository mapLayerRepository;
+    @Autowired
+    private PurpleAirSensorRepository purpleAirSensorRepository;
 	
 	@PostMapping("/Sensor")
     public Sensor addSensor(@RequestBody Sensor sensor) {
@@ -40,11 +57,23 @@ public class SensorController {
         return ResponseEntity.ok(sensorRepository.findAll());
     }
 
+
+    @GetMapping("/Sensor/AirBeam2")
+    public ResponseEntity<List<AirBeamSensor2>> getAllAirBeamSensors() {
+        return ResponseEntity.ok(airBeam2SensorRepository.findAll());
+    }
+
+
+    @GetMapping("/Sensor/PurpleAir")
+    public ResponseEntity<List<PurpleAirSensor>> getAllPurpleAirSensors() {
+        return ResponseEntity.ok(purpleAirSensorRepository.findAll());
+    }
+
     
     @GetMapping("Sensor/{SensorId}")
     public ResponseEntity<Sensor> findEmployeeById(@PathVariable(value = "SensorId") Integer SensorId) {
         Sensor sensor = sensorRepository.findById(SensorId).orElseThrow(
-                () -> new ResourceNotFoundException("Employee not found" + SensorId));
+                () -> new ResourceNotFoundException("Sensor not found " + SensorId));
         return ResponseEntity.ok().body(sensor);
     }
     
