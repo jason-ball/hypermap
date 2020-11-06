@@ -13,8 +13,9 @@ import javax.persistence.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
+@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 @Table(name = "`Sensor`")
-public class Sensor {
+public abstract class Sensor {
 	
 
     @Id

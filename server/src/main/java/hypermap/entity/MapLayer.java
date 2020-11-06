@@ -11,9 +11,9 @@ import javax.persistence.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Inheritance
+@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 @Table(name = "`MapLayer`")
-public class MapLayer {
+public abstract class MapLayer {
 
     @Id
     @GeneratedValue
