@@ -3,9 +3,7 @@ package hypermap.controller;
 import java.util.List;
 
 
-import hypermap.entity.AirBeamSensor2;
-import hypermap.entity.ArcGISOnlineLayer;
-import hypermap.entity.PurpleAirSensor;
+import hypermap.entity.*;
 import hypermap.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -17,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import hypermap.entity.Sensor;
 import hypermap.exception.ResourceNotFoundException;
 
 import org.springframework.web.bind.annotation.*;
@@ -94,6 +91,16 @@ public class SensorController {
                 () -> new ResourceNotFoundException("Employee not found" + SensorId));
         sensorRepository.delete(sensor);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/MapLayer/GeoJSON")
+    public ResponseEntity<List<GeoJSONLayer>> getAllGeoJSON() {
+        return ResponseEntity.ok(geoJSONLayerRepository.findAll());
+    }
+
+    @PostMapping(value = "/MapLayer/GeoJSON", consumes = "application/json", produces = "application/json")
+    public GeoJSONLayer addGeoJSON(@RequestBody GeoJSONLayer geoJSONLayer) {
+        return geoJSONLayerRepository.save(geoJSONLayer);
     }
 
 }
