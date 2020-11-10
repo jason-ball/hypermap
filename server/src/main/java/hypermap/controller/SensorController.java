@@ -7,6 +7,7 @@ import hypermap.entity.AirBeamSensor2;
 import hypermap.entity.ArcGISOnlineLayer;
 import hypermap.entity.PurpleAirSensor;
 import hypermap.repository.*;
+import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,6 +28,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api")
+@Api(tags = "Sensors")
 public class SensorController {
 
     @Autowired
@@ -46,7 +48,7 @@ public class SensorController {
     @Autowired
     private PurpleAirSensorRepository purpleAirSensorRepository;
 	
-	@PostMapping("/Sensor")
+	@RequestMapping(method = RequestMethod.POST, value = "/Sensor")
     public Sensor addSensor(@RequestBody Sensor sensor) {
         return sensorRepository.save(sensor);
     }
