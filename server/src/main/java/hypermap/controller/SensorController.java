@@ -1,10 +1,12 @@
 package hypermap.controller;
 
+import java.util.Base64;
 import java.util.List;
 
 
 import hypermap.entity.*;
 import hypermap.repository.*;
+import hypermap.requestbody.AdminUILayerUploadRequest;
 import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -102,8 +104,29 @@ public class SensorController {
     }
 
     @PostMapping(path = "/MapLayer/GeoJSON")
-    public void addGeoJSON(@RequestBody GeoJSONLayer geoJSONLayer) {
-        geoJSONLayerRepository.save(geoJSONLayer);
+    public void addGeoJSON(@RequestBody AdminUILayerUploadRequest request) {
+	    // Make a new layer object
+	    GeoJSONLayer layer = new GeoJSONLayer();
+
+	    // Set the basic properties from the request
+	    layer.setDescription(request.getDescription());
+	    layer.setDisplayName(request.getDisplayName());
+
+	    // Get the GeoJSON from the request
+	    String geoJSON = request.getFile();
+
+	    // Remove the MIME type
+        // https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs
+	    geoJSON = geoJSON.substring(geoJSON.indexOf(",") + 1);
+
+	    // Decode the base64 encoded GeoJSON
+	    geoJSON = new String(Base64.getDecoder().decode(geoJSON));
+
+	    // Add the geoJSON to the layer
+        layer.setGeoJSON(geoJSON);
+
+        // Save it!
+        geoJSONLayerRepository.save(layer);
     }
 
 }
