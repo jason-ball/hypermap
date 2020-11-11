@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.io.File;
 
 @Data
 @NoArgsConstructor
@@ -15,4 +16,7 @@ public class GeoJSONLayer extends MapLayer {
 
     @Column(name = "`GeoJSON`")
     private String geoJSON;
+
+//    @Transient
+//    private File file;
 }

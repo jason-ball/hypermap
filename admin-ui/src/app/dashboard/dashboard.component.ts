@@ -8,148 +8,117 @@ import { MessageService } from 'primeng/api';
 
 
 @Component({
-  selector: 'app-dashboard',
-  templateUrl: './dashboard.component.html',
-  styleUrls: ['./dashboard.component.scss'],
-  providers: [MessageService,ConfirmationService]
+    selector: 'app-dashboard',
+    templateUrl: './dashboard.component.html',
+    styleUrls: ['./dashboard.component.scss'],
+    providers: [MessageService, ConfirmationService]
 })
 export class DashboardComponent implements OnInit {
 
-  layers: Layer[];
-  cols: any[];
-  layerDialog: boolean;
-  layer: Layer;
-  selectedLayers: Layer[];
-  submitted: boolean;
+    layers: Layer[];
+    cols: any[];
+    layerDialog: boolean;
+    layer: Layer;
+    selectedLayers: Layer[];
+    submitted: boolean;
 
-  //will need to use layerservice
-  constructor(private messageService: MessageService, private confirmationService: ConfirmationService) { }
+    //will need to use layerservice
+    constructor(private messageService: MessageService, private confirmationService: ConfirmationService, private layerService: LayerService) { }
 
-  ngOnInit() {
-      //will need to refactor when making reqs
-      // this.layers = this.layerService.getLayers().then(data => this.layers = data);
+    ngOnInit() {
+        //will need to refactor when making reqs
+        this.layerService.getLayers().subscribe(data => {
+            this.layers = data;
+        });
 
-      this.layers = [
-        {
-          id: "0",
-          name: "HOLC Redlining",
-          description: "Description",
-          fileType: "GeoJSON",
-          size: 100,
-          layerData: null
-        },
-        {
-          id: "1",
-          name: "Heat Island Map",
-          fileType: "GeoJSON",
-          size: 100,
-          layerData: null
-        },
-        {
-          id: "2",
-          name: "Average Asthma Diagnoses",
-          fileType: "GeoJSON",
-          size: 100,
-          layerData: null
-        },
-        {
-          id: "4",
-          name: "Dominant Ethnicity",
-          fileType: "GeoJSON",
-          size: 100,
-          layerData: null
-        }
-      ]
-
-      this.cols = [
-          { field: 'name', header: 'Layer Name' },
-          { field: 'fileType', header: 'File Type' },
-          { field: 'size', header: 'Size' }
-      ];
-  }
+        this.cols = [
+            { field: 'name', header: 'Layer Name' },
+            { field: 'fileType', header: 'File Type' },
+            { field: 'size', header: 'Size' }
+        ];
+    }
 
 
-  openNew() {
-    this.layer = {};
-    this.submitted = false;
-    this.layerDialog = true;
-}
-
-deleteSelectedlayers() {
-    this.confirmationService.confirm({
-        message: 'Are you sure you want to delete the selected layers?',
-        header: 'Confirm',
-        icon: 'pi pi-exclamation-triangle',
-        accept: () => {
-            this.layers = this.layers.filter(val => !this.selectedLayers.includes(val));
-            this.selectedLayers = null;
-            this.messageService.add({severity:'success', summary: 'Successful', detail: 'layers Deleted', life: 3000});
-        }
-    });
-}
-
-editLayer(layer: Layer) {
-    this.layer = {...layer};
-    this.layerDialog = true;
-}
-
-deleteLayer(layer: Layer) {
-    this.confirmationService.confirm({
-        message: 'Are you sure you want to delete ' + layer.name + '?',
-        header: 'Confirm',
-        icon: 'pi pi-exclamation-triangle',
-        accept: () => {
-            this.layers = this.layers.filter(val => val.id !== layer.id);
-            this.layer = {};
-            this.messageService.add({severity:'success', summary: 'Successful', detail: 'layer Deleted', life: 3000});
-        }
-    });
-}
-
-hideDialog() {
-    this.layerDialog = false;
-    this.submitted = false;
-}
-
-saveLayer() {
-    this.submitted = true;
-
-    if (this.layer.name.trim()) {
-        if (this.layer.id) {
-            this.layers[this.findIndexById(this.layer.id)] = this.layer;                
-            this.messageService.add({severity:'success', summary: 'Successful', detail: 'Layer Updated', life: 3000});
-        }
-        else {
-            this.layer.id = this.createId();
-            this.layers.push(this.layer);
-            this.messageService.add({severity:'success', summary: 'Successful', detail: 'Layer Created', life: 3000});
-        }
-
-        this.layers = [...this.layers];
-        this.layerDialog = false;
+    openNew() {
         this.layer = {};
+        this.submitted = false;
+        this.layerDialog = true;
     }
-}
 
-findIndexById(id: string): number {
-    let index = -1;
-    for (let i = 0; i < this.layers.length; i++) {
-        if (this.layers[i].id === id) {
-            index = i;
-            break;
+    deleteSelectedlayers() {
+        this.confirmationService.confirm({
+            message: 'Are you sure you want to delete the selected layers?',
+            header: 'Confirm',
+            icon: 'pi pi-exclamation-triangle',
+            accept: () => {
+                this.layers = this.layers.filter(val => !this.selectedLayers.includes(val));
+                this.selectedLayers = null;
+                this.messageService.add({ severity: 'success', summary: 'Successful', detail: 'layers Deleted', life: 3000 });
+            }
+        });
+    }
+
+    editLayer(layer: Layer) {
+        this.layer = { ...layer };
+        this.layerDialog = true;
+    }
+
+    deleteLayer(layer: Layer) {
+        this.confirmationService.confirm({
+            message: 'Are you sure you want to delete ' + layer.displayName + '?',
+            header: 'Confirm',
+            icon: 'pi pi-exclamation-triangle',
+            accept: () => {
+                this.layers = this.layers.filter(val => val.layerId !== layer.layerId);
+                this.layer = {};
+                this.messageService.add({ severity: 'success', summary: 'Successful', detail: 'layer Deleted', life: 3000 });
+            }
+        });
+    }
+
+    hideDialog() {
+        this.layerDialog = false;
+        this.submitted = false;
+    }
+
+    saveLayer() {
+        this.submitted = true;
+
+        if (this.layer.displayName.trim()) {
+            if (this.layer.layerId) {
+                this.layers[this.findIndexById(this.layer.layerId)] = this.layer;
+                this.messageService.add({ severity: 'success', summary: 'Successful', detail: 'Layer Updated', life: 3000 });
+            }
+            else {
+                this.layers.push(this.layer);
+                this.layerService.uploadLayer(this.layer).subscribe(response => this.messageService.add({ severity: 'success', summary: 'Successful', detail: 'Layer Created', life: 3000 }),
+                    err => console.log(err)
+                  );
+                this.messageService.add({ severity: 'success', summary: 'Successful', detail: 'Layer Created', life: 3000 });
+            }
+
+            this.layers = [...this.layers];
+            this.layerDialog = false;
+            this.layer = {};
         }
     }
 
-    return index;
-}
 
-createId(): string {
-    let id = '';
-    var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    for ( var i = 0; i < 5; i++ ) {
-        id += chars.charAt(Math.floor(Math.random() * chars.length));
+    handleFile(event: any) {
+        this.layer.file = event;
+        // this.layer.geoJSON = event as Layer;
+        this.layer.fileType = "GeoJSON";
     }
-    return id;
-}
 
+    findIndexById(id: string): number {
+        let index = -1;
+        for (let i = 0; i < this.layers.length; i++) {
+            if (this.layers[i].layerId === id) {
+                index = i;
+                break;
+            }
+        }
+
+        return index;
+    }
 }

@@ -1,33 +1,21 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Layer } from '../models/layer.model';
-
-export interface Book {
-  name;
-  price;
-  author;
-}
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class LayerService {
 
-    constructor(private http: HttpClient) {}
+    constructor(private httpClient: HttpClient) {}
 
-    getLayers(): Layer[] {
-        return [
-            {
-                name: "HOLC Redlining",
-                fileType: "GeoJSON",
-                size: 100,
-                layerData: null
-            }
-        ];
+    getLayers(): Observable<Layer[]> {
+        return this.httpClient.get<Layer[]>('http://localhost:5431/api/MapLayer/GeoJSON');
     }
 
-    uploadLayer(data: any) {
-        // post new layer
+    uploadLayer(data: Layer) {
+        return this.httpClient.post<any>('http://localhost:5431/api/MapLayer/GeoJSON', data);
     }
 
     updateLayer(data: any) {

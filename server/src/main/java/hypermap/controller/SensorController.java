@@ -5,6 +5,7 @@ import java.util.List;
 
 import hypermap.entity.*;
 import hypermap.repository.*;
+import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,6 +25,8 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api")
+@Api(tags = "Sensors")
+@CrossOrigin(origins = "http://localhost:5431")
 public class SensorController {
 
     @Autowired
@@ -43,7 +46,7 @@ public class SensorController {
     @Autowired
     private PurpleAirSensorRepository purpleAirSensorRepository;
 	
-	@PostMapping("/Sensor")
+	@RequestMapping(method = RequestMethod.POST, value = "/Sensor")
     public Sensor addSensor(@RequestBody Sensor sensor) {
         return sensorRepository.save(sensor);
     }
@@ -98,9 +101,9 @@ public class SensorController {
         return ResponseEntity.ok(geoJSONLayerRepository.findAll());
     }
 
-    @PostMapping(value = "/MapLayer/GeoJSON", consumes = "application/json", produces = "application/json")
-    public GeoJSONLayer addGeoJSON(@RequestBody GeoJSONLayer geoJSONLayer) {
-        return geoJSONLayerRepository.save(geoJSONLayer);
+    @PostMapping(path = "/MapLayer/GeoJSON")
+    public void addGeoJSON(@RequestBody GeoJSONLayer geoJSONLayer) {
+        geoJSONLayerRepository.save(geoJSONLayer);
     }
 
 }
