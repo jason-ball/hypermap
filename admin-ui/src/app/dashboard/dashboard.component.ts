@@ -90,10 +90,11 @@ export class DashboardComponent implements OnInit {
             if (this.fileObject) {
                 this.layer.file = await this.toBase64(this.fileObject);
             }
-
-            if (this.layer.layerId) {
-                this.layers[this.findIndexById(this.layer.layerId)] = this.layer;
-                this.messageService.add({ severity: 'success', summary: 'Successful', detail: 'Layer Updated', life: 3000 });
+            if (this.layer.layerID) {
+                this.layers[this.findIndexById(this.layer.layerID)] = this.layer;
+                this.layerService.updateLayer(this.layer).subscribe(response => this.messageService.add({ severity: 'success', summary: 'Successful', detail: 'Layer Updated', life: 3000 }),
+                    err => console.log(err)
+                );
             }
             else {
                 this.layers.push(this.layer);
