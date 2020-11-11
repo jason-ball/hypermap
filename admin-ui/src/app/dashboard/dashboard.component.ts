@@ -21,6 +21,7 @@ export class DashboardComponent implements OnInit {
     layer: Layer;
     selectedLayers: Layer[];
     submitted: boolean;
+    fileObject?: File;
 
     //will need to use layerservice
     constructor(private messageService: MessageService, private confirmationService: ConfirmationService, private layerService: LayerService) { }
@@ -81,10 +82,15 @@ export class DashboardComponent implements OnInit {
         this.submitted = false;
     }
 
-    saveLayer() {
+    async saveLayer() {
         this.submitted = true;
 
         if (this.layer.displayName.trim()) {
+
+            if (this.fileObject) {
+                this.layer.file = await this.toBase64(this.fileObject);
+            }
+
             if (this.layer.layerId) {
                 this.layers[this.findIndexById(this.layer.layerId)] = this.layer;
                 this.messageService.add({ severity: 'success', summary: 'Successful', detail: 'Layer Updated', life: 3000 });
@@ -93,19 +99,19 @@ export class DashboardComponent implements OnInit {
                 this.layers.push(this.layer);
                 this.layerService.uploadLayer(this.layer).subscribe(response => this.messageService.add({ severity: 'success', summary: 'Successful', detail: 'Layer Created', life: 3000 }),
                     err => console.log(err)
-                  );
+                );
                 this.messageService.add({ severity: 'success', summary: 'Successful', detail: 'Layer Created', life: 3000 });
             }
 
             this.layers = [...this.layers];
             this.layerDialog = false;
             this.layer = {};
+            this.fileObject = null;
         }
     }
 
-
     handleFile(event: any) {
-        this.layer.file = event;
+        this.fileObject = event.currentFiles[0];
         // this.layer.geoJSON = event as Layer;
         this.layer.fileType = "GeoJSON";
     }
@@ -120,5 +126,14 @@ export class DashboardComponent implements OnInit {
         }
 
         return index;
+    }
+
+    toBase64(file): Promise<string | ArrayBuffer> {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = error => reject(error);
+        });
     }
 }
