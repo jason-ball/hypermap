@@ -1,5 +1,5 @@
 export class Layer {
-    layerID?: string;
+    layerID?: number;
     displayName?: string;
     description?: string;
     fileType?: string;
