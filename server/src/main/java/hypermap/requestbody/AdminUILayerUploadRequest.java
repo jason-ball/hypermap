@@ -10,6 +10,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class AdminUILayerUploadRequest {
     @JsonProperty
+    private int layerID;
+
+    @JsonProperty
     private String displayName;
 
     @JsonProperty
