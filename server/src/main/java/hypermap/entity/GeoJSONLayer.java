@@ -1,5 +1,6 @@
 package hypermap.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,7 +16,9 @@ import java.io.File;
 public class GeoJSONLayer extends MapLayer {
 
     @Column(name = "`GeoJSON`")
+    @JsonProperty
     private String geoJSON;
+
 
 //    @Transient
 //    private File file;
