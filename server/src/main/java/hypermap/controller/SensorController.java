@@ -71,7 +71,7 @@ public class SensorController {
 
     
     @GetMapping("Sensor/{SensorId}")
-    public ResponseEntity<Sensor> findEmployeeById(@PathVariable(value = "SensorId") Integer SensorId) {
+    public ResponseEntity<Sensor> getSensorById(@PathVariable(value = "SensorId") Integer SensorId) {
         Sensor sensor = sensorRepository.findById(SensorId).orElseThrow(
                 () -> new ResourceNotFoundException("Sensor not found " + SensorId));
         return ResponseEntity.ok().body(sensor);
@@ -82,7 +82,6 @@ public class SensorController {
                                                    @RequestBody Sensor sensorDetails) {
        Sensor sensor = sensorRepository.findById(SensorId)
                 .orElseThrow(() -> new ResourceNotFoundException("Sensor not found for this id :: " + SensorId));
-        sensor.equals(sensor);
         final Sensor updatedSensor = sensorRepository.save(sensor);
         return ResponseEntity.ok(updatedSensor);
 
