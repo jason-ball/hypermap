@@ -23,12 +23,10 @@ import hypermap.exception.ResourceNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
 
-
-
 @RestController
 @RequestMapping("/api")
 @Api(tags = "Sensors")
-@CrossOrigin(origins = "http://localhost:5431")
+@CrossOrigin
 public class SensorController {
 
     @Autowired
@@ -159,6 +157,11 @@ public class SensorController {
 
         // Save it!
         geoJSONLayerRepository.save(layer);
+    }
+
+    @DeleteMapping(path = "/MapLayer/GeoJSON/{id}")
+    public void deleteGeoJson(@PathVariable(value = "id") String id) {
+	    geoJSONLayerRepository.deleteById(Integer.valueOf(id));
     }
 
 }
