@@ -18,8 +18,8 @@ export class LayerService {
         return this.httpClient.post<any>('http://localhost:5431/api/MapLayer/GeoJSON', data);
     }
 
-    updateLayer(data: any) {
-        // update layer
+    updateLayer(data: Layer) {
+        return this.httpClient.put<any>('http://localhost:5431/api/MapLayer/GeoJSON', data);
     }
 
     deleteLayer(id: number) {
