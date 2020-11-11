@@ -23,6 +23,6 @@ export class LayerService {
     }
 
     deleteLayer(id: number) {
-        // delete layer
+        return this.httpClient.delete<any>(`http://localhost:5431/api/MapLayer/GeoJSON/${id}`);
     }
 }

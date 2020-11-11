@@ -70,9 +70,11 @@ export class DashboardComponent implements OnInit {
             header: 'Confirm',
             icon: 'pi pi-exclamation-triangle',
             accept: () => {
+                this.layerService.deleteLayer(layer.layerID).subscribe(response => this.messageService.add({ severity: 'success', summary: 'Successful', detail: 'Layer Deleted', life: 3000 }),
+                    err => console.log(err)
+                );
                 this.layers = this.layers.filter(val => val.layerID !== layer.layerID);
                 this.layer = {};
-                this.messageService.add({ severity: 'success', summary: 'Successful', detail: 'layer Deleted', life: 3000 });
             }
         });
     }
@@ -117,7 +119,7 @@ export class DashboardComponent implements OnInit {
         this.layer.fileType = "GeoJSON";
     }
 
-    findIndexById(id: string): number {
+    findIndexById(id: number): number {
         let index = -1;
         for (let i = 0; i < this.layers.length; i++) {
             if (this.layers[i].layerID === id) {
