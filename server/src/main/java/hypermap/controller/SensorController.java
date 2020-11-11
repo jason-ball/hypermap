@@ -128,7 +128,7 @@ public class SensorController {
 
     @PutMapping(path = "/MapLayer/GeoJSON")
     public void updateGeoJson(@RequestBody AdminUILayerUploadRequest request) {
-        // Make a new layer object
+        // Get the layer from the DB
         GeoJSONLayer layer = geoJSONLayerRepository.getOne(request.getLayerID());
 
         // Set the basic properties from the request
