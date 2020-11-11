@@ -70,7 +70,7 @@ export class DashboardComponent implements OnInit {
             header: 'Confirm',
             icon: 'pi pi-exclamation-triangle',
             accept: () => {
-                this.layers = this.layers.filter(val => val.layerId !== layer.layerId);
+                this.layers = this.layers.filter(val => val.layerID !== layer.layerID);
                 this.layer = {};
                 this.messageService.add({ severity: 'success', summary: 'Successful', detail: 'layer Deleted', life: 3000 });
             }
@@ -119,7 +119,7 @@ export class DashboardComponent implements OnInit {
     findIndexById(id: string): number {
         let index = -1;
         for (let i = 0; i < this.layers.length; i++) {
-            if (this.layers[i].layerId === id) {
+            if (this.layers[i].layerID === id) {
                 index = i;
                 break;
             }
