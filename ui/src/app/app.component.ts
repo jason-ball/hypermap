@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { SensorService } from './services/sensor.service';
 
 @Component({
   selector: 'app-root',
@@ -12,6 +13,7 @@ export class AppComponent {
   basemapType = 'streets-vector';
   mapZoomLevel = 11;
 
+  constructor(private sensorService: SensorService) {}
   // See app.component.html
   mapLoadedEvent(status: boolean) {
     console.log('The map loaded: ' + status);

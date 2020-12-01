@@ -3,6 +3,7 @@ import Map from "esri/Map";
 import MapView from "esri/views/MapView";
 import FeatureLayer from "esri/layers/FeatureLayer";
 import esriConfig from "esri/config";
+import GeoJSONLayer from "esri/layers/GeoJSONLayer";
 
 @Component({
   selector: 'app-map',
@@ -58,25 +59,60 @@ export class MapComponent implements OnInit, OnDestroy {
   async initializeMap() {
 
     this.initializeWorkers();
+    
+    let sensorLabels:any[] = [];
+    const nameArcade = "$feature.PM2_5Value";
+    const nameClass = {
+      labelPlacement: "below-right",
+      minScale: 2500000,
+      labelExpressionInfo: {
+        expression: nameArcade
+      }
+    };
+    sensorLabels.push(nameClass)
 
-    const citiesRenderer = {
+
+    const sensorRenderer = {
       type: "simple", // autocasts as new SimpleRenderer()
       symbol: {
         type: "simple-marker", // autocasts as new SimpleMarkerSymbol()
-        size: 5,
+        size: 30,
         color: [0, 244, 255, 1]
-      }
+      },
+      visualVariables: [
+        {
+          type: "color",
+          field: "PM2_5Value",
+          stops: [
+            { value: 0, color: "#00FF00" },
+            { value: 50, color: "#FFFF00"},
+            { value: 150, color: "#FF0000" }
+          ]
+        }
+      ],
+      labelingInfo: [nameClass]
     };
 
-    const policeStopsLayer = new FeatureLayer({
-      url: "https://services.arcgis.com/V6ZHFr6zdgNZuVG0/arcgis/rest/services/Denver_Police_Stops/FeatureServer/0",
-      renderer: citiesRenderer as any
+    const sensorDetailTemplate = {
+      title: "{Label}",
+      content: "PM 2.5: {PM2_5Value}"
+    };
+
+    // const policeStopsLayer = new FeatureLayer({
+    //   url: "https://services.arcgis.com/V6ZHFr6zdgNZuVG0/arcgis/rest/services/Denver_Police_Stops/FeatureServer/0",
+    //   renderer: citiesRenderer as any
+    // });
+
+    const purpleAirLayer = new GeoJSONLayer({
+      url: "https://k5emdaxun6.execute-api.us-east-1.amazonaws.com/dev/layer/42",
+      popupTemplate: sensorDetailTemplate,
+      renderer: sensorRenderer as any
     });
 
     // Configure the Map
     const mapProperties = {
       basemap: this._basemap,
-      layers: [policeStopsLayer]
+      layers: [purpleAirLayer]
     };
 
     const map = new Map(mapProperties);   
@@ -89,6 +125,7 @@ export class MapComponent implements OnInit, OnDestroy {
       map: map
     };
 
+    
     this._view = new MapView(mapViewProperties);
     
     // wait for the map to load
