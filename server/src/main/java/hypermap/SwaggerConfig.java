@@ -3,6 +3,7 @@ package hypermap;
 import com.google.common.base.Predicate;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
 import springfox.documentation.builders.ApiInfoBuilder;
@@ -22,9 +23,11 @@ public class SwaggerConfig {
     @Bean
     public Docket postsApi() {
         return new Docket(DocumentationType.SWAGGER_2).groupName("Hypermap").select()
-                .apis(RequestHandlerSelectors.basePackage("hypermap.controller"))
-                .paths(PathSelectors.ant("/api/**")).build();
+                .apis(RequestHandlerSelectors.withClassAnnotation(RestController.class))
+                .paths(PathSelectors.ant("/api/**"))
+                .build();
     }
+
 
 //    private Predicate<String> postPaths() {
 //        return or(regex("/api.*"), regex("/api/hypermap.controller.*"));
