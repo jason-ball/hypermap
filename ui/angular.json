@@ -19,8 +19,8 @@
           "options": {
             "customWebpackConfig": {
               "path": "./extra-webpack.config.js"
-            },                        
-            "outputPath": "dist/",
+            },
+            "outputPath": "dist/ui",
             "index": "src/index.html",
             "main": "src/main.ts",
             "polyfills": "src/polyfills.ts",
@@ -92,7 +92,7 @@
           "options": {
             "customWebpackConfig": {
               "path": "./extra-webpack.config.js"
-            },            
+            },
             "main": "src/test.ts",
             "polyfills": "src/polyfills.ts",
             "tsConfig": "tsconfig.spec.json",
