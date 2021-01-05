@@ -1,5 +1,6 @@
-<div class="map-viewport">  
+<div class="map-viewport">
   <app-map [center]="mapCenter" [basemap]="basemapType" [zoom]="mapZoomLevel"
     (mapLoadedEvent)="mapLoadedEvent($event)">
   </app-map>
+  <app-welcome></app-welcome>
 </div>
