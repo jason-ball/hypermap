@@ -1,7 +1,8 @@
 import { Component, OnInit, OnDestroy, ViewChild, ElementRef, Input, Output, EventEmitter, NgZone } from '@angular/core';
+import { MenuItem, PrimeIcons } from 'primeng/api';
+
 import Map from "esri/Map";
 import MapView from "esri/views/MapView";
-import FeatureLayer from "esri/layers/FeatureLayer";
 import esriConfig from "esri/config";
 import GeoJSONLayer from 'esri/layers/GeoJSONLayer';
 import PopupTemplate from 'esri/PopupTemplate';
@@ -15,7 +16,9 @@ import FieldInfoFormat from 'esri/popup/support/FieldInfoFormat';
 import ExpressionInfo from 'esri/popup/ExpressionInfo';
 import FeatureReductionCluster from 'esri/layers/support/FeatureReductionCluster';
 import TextSymbol from 'esri/symbols/TextSymbol';
-import Font from 'esri/symbols/Font'
+import Font from 'esri/symbols/Font';
+
+import { WelcomeService } from '../services/welcome.service';
 
 @Component({
   selector: 'app-map',
@@ -30,10 +33,12 @@ export class MapComponent implements OnInit, OnDestroy {
   @ViewChild('mapViewNode', { static: true }) private mapViewEl: ElementRef;
 
   private _zoom = 10;
-  private _center: Array<number> = [0.1278, 51.5074];
+  private _center: Array<number> = [-77.46576684324452, 37.56118644444622];
   private _basemap = 'streets';
   private _loaded = false;
   private _view: MapView = null;
+
+  hypermapMenuItems: MenuItem[];
 
   get mapLoaded(): boolean {
     return this._loaded;
@@ -66,7 +71,11 @@ export class MapComponent implements OnInit, OnDestroy {
     return this._basemap;
   }
 
-  constructor(private zone: NgZone) { }
+  openModal() {
+    this.welcomeService.openModal();
+  }
+
+  constructor(private zone: NgZone, private welcomeService: WelcomeService) { }
 
   async initializeMap() {
 
@@ -156,6 +165,7 @@ export class MapComponent implements OnInit, OnDestroy {
 
     const purpleAirLayer = new GeoJSONLayer({
       url: "https://k5emdaxun6.execute-api.us-east-1.amazonaws.com/dev/purpleair",
+      title: 'PurpleAir Sensors',
       popupTemplate: sensorDetailTemplate,
       renderer: sensorRenderer,
       labelingInfo: [purpleAirLabels],
@@ -189,6 +199,8 @@ export class MapComponent implements OnInit, OnDestroy {
     // wait for the map to load
     await this._view.when();
 
+    this._view.ui.add('mapMenuButton', 'bottom-right');
+
     this._view.on('click', async (event) => {
       const r = await this._view.hitTest(event.screenPoint);
       r.results.forEach(result => {
@@ -200,6 +212,15 @@ export class MapComponent implements OnInit, OnDestroy {
         }
       })
     })
+
+    this.welcomeService.show.subscribe(modalOpen => {
+      if (modalOpen) {
+        this._view.goTo({
+          center: [-77.46576684324452, 37.56118644444622],
+          zoom: 10
+        });
+      }
+    });
 
     return this._view;
   }
@@ -261,6 +282,22 @@ export class MapComponent implements OnInit, OnDestroy {
       });
     }) */
     this.initializeMap();
+    this.hypermapMenuItems = [
+      {
+        label: 'Refresh',
+        icon: PrimeIcons.REFRESH,
+        command() {
+          window.location.reload();
+        }
+      },
+      {
+        label: 'Exit',
+        icon: PrimeIcons.TIMES,
+        command: () => {
+          this.welcomeService.openModal();
+        }
+      }
+    ]
   }
 
   ngOnDestroy() {
