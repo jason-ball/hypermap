@@ -1,0 +1,15 @@
+<p-dialog [(visible)]="show" [modal]="true" [style]="{width: '30vw'}" [draggable]="false"
+  [resizable]="false" [closable]="false">
+  <p-header>
+    <h1 class="p-text-center">Hypermap</h1>
+    <hr style="opacity: 20%;">
+  </p-header>
+  <h2 class="p-text-center">Interactive Air Quality Map</h2>
+  <button pButton type="button" id="getStartedButton" label="Get Started!" class="p-button-lg" (click)="closeModal()"></button>
+
+  <p-footer>
+    <hr style="opacity: 20%;">
+    <button pButton type="button" id="colorblindButton" label="Colorblind?" icon="pi pi-eye" iconPos="left" class="p-button-outlined p-button-secondary p-text-bold" (click)="menu.toggle($event)"></button>
+    <p-menu #menu id="colorblindMenu" [popup]="true" [model]="colorblindItems" appendTo="body"></p-menu>
+  </p-footer>
+</p-dialog>

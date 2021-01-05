@@ -1,2 +1,6 @@
 <!-- Here's the DIV that we inject the map into -->
 <div #mapViewNode></div>
+<div id="mapMenuButton" class="esri-widget esri-component">
+  <button pButton type="button" label="Hypermap Menu" icon="pi pi-bars" class="p-button-lg" (click)="hypermapMenu.toggle($event)"></button>
+  <p-menu #hypermapMenu id="hypermapMenu" [popup]="true" [model]="hypermapMenuItems" appendTo="body"></p-menu>
+</div>

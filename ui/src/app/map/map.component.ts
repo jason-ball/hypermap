@@ -1,7 +1,8 @@
 import { Component, OnInit, OnDestroy, ViewChild, ElementRef, Input, Output, EventEmitter, NgZone } from '@angular/core';
+import { MenuItem, PrimeIcons } from 'primeng/api';
+
 import Map from "esri/Map";
 import MapView from "esri/views/MapView";
-import FeatureLayer from "esri/layers/FeatureLayer";
 import esriConfig from "esri/config";
 import GeoJSONLayer from 'esri/layers/GeoJSONLayer';
 import PopupTemplate from 'esri/PopupTemplate';
@@ -15,8 +16,9 @@ import FieldInfoFormat from 'esri/popup/support/FieldInfoFormat';
 import ExpressionInfo from 'esri/popup/ExpressionInfo';
 import FeatureReductionCluster from 'esri/layers/support/FeatureReductionCluster';
 import TextSymbol from 'esri/symbols/TextSymbol';
-import Font from 'esri/symbols/Font'
+import Font from 'esri/symbols/Font';
 import LayerList from 'esri/widgets/LayerList';
+import { WelcomeService } from '../services/welcome.service';
 import { LayerService } from '../services/layer.service';
 
 @Component({
@@ -32,11 +34,12 @@ export class MapComponent implements OnInit, OnDestroy {
   @ViewChild('mapViewNode', { static: true }) private mapViewEl: ElementRef;
 
   private _zoom = 10;
-  private _center: Array<number> = [0.1278, 51.5074];
+  private _center: Array<number> = [-77.46576684324452, 37.56118644444622];
   private _basemap = 'streets';
   private _loaded = false;
   private _view: MapView = null;
   private layers: Array<GeoJSONLayer> = [];
+  hypermapMenuItems: MenuItem[];
 
   get mapLoaded(): boolean {
     return this._loaded;
@@ -69,7 +72,11 @@ export class MapComponent implements OnInit, OnDestroy {
     return this._basemap;
   }
 
-  constructor(private zone: NgZone, protected layerService: LayerService) { }
+  openModal() {
+    this.welcomeService.openModal();
+  }
+  
+  constructor(private zone: NgZone, private welcomeService: WelcomeService, private layerService: LayerService) { }
 
   async initializeMap() {
 
@@ -155,6 +162,7 @@ export class MapComponent implements OnInit, OnDestroy {
     // Create and push the layer for PurpleAir sensors
     const purpleAirLayer = new GeoJSONLayer({
       url: "https://k5emdaxun6.execute-api.us-east-1.amazonaws.com/dev/purpleair",
+      title: 'PurpleAir Sensors',
       popupTemplate: sensorDetailTemplate,
       renderer: sensorRenderer,
       labelingInfo: [purpleAirLabels],
@@ -163,8 +171,7 @@ export class MapComponent implements OnInit, OnDestroy {
         clusterMinSize: 30,
         clusterMaxSize: 30,
         labelingInfo: [clusteredPurpleAirLabels]
-      }),
-      title: "Purple Air Sensors"
+      })
     });
     this.layers.push(purpleAirLayer);
 
@@ -227,8 +234,11 @@ export class MapComponent implements OnInit, OnDestroy {
           }
         }
       });
-
+      
+      // Add widgets to view
       this._view.ui.add(layerList, 'top-right');
+      this._view.ui.add('mapMenuButton', 'bottom-right');
+
 
       this._view.on('click', async (event) => {
         const r = await this._view.hitTest(event.screenPoint);
@@ -244,6 +254,16 @@ export class MapComponent implements OnInit, OnDestroy {
 
       // Done loading the map
       this.mapLoadedEvent.emit(true);
+      
+      // Welcome Modal
+      this.welcomeService.show.subscribe(modalOpen => {
+      if (modalOpen) {
+        this._view.goTo({
+          center: [-77.46576684324452, 37.56118644444622],
+          zoom: 10
+        });
+      }
+    });
     })
   }
 
@@ -308,6 +328,22 @@ export class MapComponent implements OnInit, OnDestroy {
       });
     }) */
     this.initializeMap();
+    this.hypermapMenuItems = [
+      {
+        label: 'Refresh',
+        icon: PrimeIcons.REFRESH,
+        command() {
+          window.location.reload();
+        }
+      },
+      {
+        label: 'Exit',
+        icon: PrimeIcons.TIMES,
+        command: () => {
+          this.welcomeService.openModal();
+        }
+      }
+    ]
   }
 
   ngOnDestroy() {
