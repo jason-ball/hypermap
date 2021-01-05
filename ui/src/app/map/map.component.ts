@@ -16,6 +16,8 @@ import ExpressionInfo from 'esri/popup/ExpressionInfo';
 import FeatureReductionCluster from 'esri/layers/support/FeatureReductionCluster';
 import TextSymbol from 'esri/symbols/TextSymbol';
 import Font from 'esri/symbols/Font'
+import LayerList from 'esri/widgets/LayerList';
+import { LayerService } from '../services/layer.service';
 
 @Component({
   selector: 'app-map',
@@ -34,6 +36,7 @@ export class MapComponent implements OnInit, OnDestroy {
   private _basemap = 'streets';
   private _loaded = false;
   private _view: MapView = null;
+  private layers: Array<GeoJSONLayer> = [];
 
   get mapLoaded(): boolean {
     return this._loaded;
@@ -66,7 +69,7 @@ export class MapComponent implements OnInit, OnDestroy {
     return this._basemap;
   }
 
-  constructor(private zone: NgZone) { }
+  constructor(private zone: NgZone, protected layerService: LayerService) { }
 
   async initializeMap() {
 
@@ -106,7 +109,7 @@ export class MapComponent implements OnInit, OnDestroy {
           field: "CorrectedPM2_5Value",
           stops: [
             { value: 0, color: "#00FF00" },
-            { value: 50, color: "#FFFF00"},
+            { value: 50, color: "#FFFF00" },
             { value: 150, color: "#FF0000" }
           ]
         })
@@ -149,11 +152,7 @@ export class MapComponent implements OnInit, OnDestroy {
       ]
     });
 
-    // const policeStopsLayer = new FeatureLayer({
-    //   url: "https://services.arcgis.com/V6ZHFr6zdgNZuVG0/arcgis/rest/services/Denver_Police_Stops/FeatureServer/0",
-    //   renderer: citiesRenderer as any
-    // });
-
+    // Create and push the layer for PurpleAir sensors
     const purpleAirLayer = new GeoJSONLayer({
       url: "https://k5emdaxun6.execute-api.us-east-1.amazonaws.com/dev/purpleair",
       popupTemplate: sensorDetailTemplate,
@@ -164,44 +163,88 @@ export class MapComponent implements OnInit, OnDestroy {
         clusterMinSize: 30,
         clusterMaxSize: 30,
         labelingInfo: [clusteredPurpleAirLabels]
-      })
+      }),
+      title: "Purple Air Sensors"
     });
+    this.layers.push(purpleAirLayer);
 
-    // Configure the Map
-    const mapProperties = {
-      basemap: this._basemap,
-      layers: [purpleAirLayer]
-    };
+    // Add each layer uploaded via admin UI to array of available layers
+    this.layerService.getLayers().subscribe(async layers => {
+      layers.forEach(layer => {
+        const newLayer = new GeoJSONLayer({
+          url: `http://localhost:5431${layer.path}`,
+          title: layer.name
+        });
+        this.layers.push(newLayer);
+      });
+      // const newLayer = new GeoJSONLayer({
+      //   // url: `http://localhost:5431${layer.path}`,
+      //   url: 'http://localhost:5431/api/layers/get/61',
+      //   title: "xyz"
+      // });
+      // this.layers.push(newLayer);
 
-    const map = new Map(mapProperties);
+      // Configure the Map
+      const mapProperties = {
+        basemap: this._basemap,
+        layers: this.layers
+      };
 
-    // Initialize the MapView
-    const mapViewProperties = {
-      container: this.mapViewEl.nativeElement,
-      center: this._center,
-      zoom: this._zoom,
-      map: map
-    };
+      const map = new Map(mapProperties);
+
+      // Initialize the MapView
+      const mapViewProperties = {
+        container: this.mapViewEl.nativeElement,
+        center: this._center,
+        zoom: this._zoom,
+        map: map
+      };
 
 
-    this._view = new MapView(mapViewProperties);
+      this._view = new MapView(mapViewProperties);
 
-    // wait for the map to load
-    await this._view.when();
+      // wait for the map to load
+      await this._view.when();
 
-    this._view.on('click', async (event) => {
-      const r = await this._view.hitTest(event.screenPoint);
-      r.results.forEach(result => {
-        if (result.graphic.attributes.clusterId) {
-          this._view.goTo({
-            target: result.graphic,
-            zoom: this._view.zoom + 2
-          })
+      // Add LayerList Widget
+      const layerList = new LayerList({
+        view: this._view,
+        // executes for each ListItem in the LayerList
+        listItemCreatedFunction: function (event) {
+          // The event object contains properties of the
+          // layer in the LayerList widget.
+          var item = event.item;
+
+          if (item) {
+            // open the list item in the LayerList
+            item.open = true;
+            // set an action for zooming to the full extent of the layer
+            item.actionsSections = [[{
+              title: "Go to full extent",
+              className: "esri-icon-zoom-out-fixed",
+              id: "full-extent"
+            }]];
+          }
         }
-      })
-    })
+      });
 
-    return this._view;
+      this._view.ui.add(layerList, 'top-right');
+
+      this._view.on('click', async (event) => {
+        const r = await this._view.hitTest(event.screenPoint);
+        r.results.forEach(result => {
+          if (result.graphic.attributes.clusterId) {
+            this._view.goTo({
+              target: result.graphic,
+              zoom: this._view.zoom + 2
+            })
+          }
+        })
+      });
+
+      // Done loading the map
+      this.mapLoadedEvent.emit(true);
+    })
   }
 
   initializeWorkers() {
@@ -248,6 +291,10 @@ export class MapComponent implements OnInit, OnDestroy {
     };
   }
 
+  // getLayers(): Array<GeoJSONLayer> {
+  //   this.layerService.getLayers().subscribe
+  // }
+
   ngOnInit() {
     /* // For more info on change detection handling see: https://github.com/Esri/angular-cli-esri-map/issues/70
     // as well as this blog post: https://www.andygup.net/manual-change-detection-in-angular-for-performance/
@@ -264,7 +311,7 @@ export class MapComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    if (this._view){
+    if (this._view) {
       this._view.container = null;
     }
   }
