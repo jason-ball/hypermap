@@ -12,10 +12,12 @@ export class AppComponent {
   mapCenter = [-77.4527, 37.5483];
   basemapType = 'streets-vector';
   mapZoomLevel = 11;
+  loading: boolean = true;
 
   constructor(private sensorService: SensorService) {}
   // See app.component.html
   mapLoadedEvent(status: boolean) {
     console.log('The map loaded: ' + status);
+    this.loading = false;
   }
 }
