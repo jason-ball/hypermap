@@ -1,7 +1,9 @@
 package hypermap.controller;
 
 import hypermap.entity.GeoJSONLayer;
+import hypermap.entity.LayerIdAndName;
 import hypermap.repository.GeoJSONLayerRepository;
+import hypermap.repository.SimpleGeoJSONLayerRepository;
 import hypermap.response.LayerResponse;
 import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,12 +21,13 @@ import java.util.Optional;
 @CrossOrigin
 public class LayerController {
     private GeoJSONLayerRepository geoJSONLayerRepository;
+    private SimpleGeoJSONLayerRepository simpleGeoJSONLayerRepository;
 
     @GetMapping("layers")
     public ResponseEntity<List<LayerResponse>> getGeoJSONLayers() {
-        List<GeoJSONLayer> geoJSONLayers = geoJSONLayerRepository.findAll();
+        List<LayerIdAndName> geoJSONLayers = simpleGeoJSONLayerRepository.findAll();
         List<LayerResponse> layers = new ArrayList<>();
-        for (GeoJSONLayer layer : geoJSONLayers) {
+        for (LayerIdAndName layer : geoJSONLayers) {
             LayerResponse response = new LayerResponse();
             response.setName(layer.getDisplayName());
             response.setType("GeoJSON");
@@ -48,5 +51,10 @@ public class LayerController {
     @Autowired
     public void setGeoJSONLayerRepository(GeoJSONLayerRepository geoJSONLayerRepository) {
         this.geoJSONLayerRepository = geoJSONLayerRepository;
+    }
+
+    @Autowired
+    public void setSimpleGeoJSONLayerRepository(SimpleGeoJSONLayerRepository simpleGeoJSONLayerRepository) {
+        this.simpleGeoJSONLayerRepository = simpleGeoJSONLayerRepository;
     }
 }

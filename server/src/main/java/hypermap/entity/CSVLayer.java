@@ -1,3 +1,4 @@
+/*
 package hypermap.entity;
 
 import lombok.AllArgsConstructor;
@@ -19,3 +20,4 @@ public class CSVLayer extends MapLayer {
     @Column(name = "`CSVFile`")
     private String csvFile;
 }
+*/

@@ -34,13 +34,7 @@ public class SensorController {
     @Autowired
     private AirBeam2SensorRepository airBeam2SensorRepository;
     @Autowired
-    private ArcGISOnlineLayerRepository arcGISOnlineLayerRepository;
-    @Autowired
-    private CSVLayerRepository csvLayerRepository;
-    @Autowired
     private GeoJSONLayerRepository geoJSONLayerRepository;
-    @Autowired
-    private HTTPLayerRepository httpLayerRepository;
     @Autowired
     private MapLayerRepository mapLayerRepository;
     @Autowired

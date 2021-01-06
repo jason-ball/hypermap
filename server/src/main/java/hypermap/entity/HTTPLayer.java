@@ -1,3 +1,4 @@
+/*
 package hypermap.entity;
 
 import lombok.AllArgsConstructor;
@@ -21,3 +22,4 @@ public class HTTPLayer extends MapLayer {
     @Column(name = "`MapLayer`")
     private int updateFrequency;
 }
+*/

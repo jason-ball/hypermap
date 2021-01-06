@@ -1,3 +1,4 @@
+/*
 package hypermap.entity;
 
 import lombok.AllArgsConstructor;
@@ -18,3 +19,4 @@ public class ArcGISOnlineLayer extends MapLayer {
     @Column(name = "`ArcGISOnlineID`")
     private String arcGISDisplayName;
 }
+*/
