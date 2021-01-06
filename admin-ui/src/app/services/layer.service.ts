@@ -11,7 +11,7 @@ export class LayerService {
     constructor(private httpClient: HttpClient) {}
 
     getLayers(): Observable<Layer[]> {
-        return this.httpClient.get<Layer[]>('http://localhost:5431/api/MapLayer/GeoJSON');
+        return this.httpClient.get<Layer[]>('http://localhost:5431/api/layers');
     }
 
     uploadLayer(data: Layer) {

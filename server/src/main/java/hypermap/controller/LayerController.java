@@ -1,7 +1,7 @@
 package hypermap.controller;
 
 import hypermap.entity.GeoJSONLayer;
-import hypermap.entity.LayerIdAndName;
+import hypermap.entity.SmallGeoJSONLayer;
 import hypermap.repository.GeoJSONLayerRepository;
 import hypermap.repository.SimpleGeoJSONLayerRepository;
 import hypermap.response.LayerResponse;
@@ -25,13 +25,18 @@ public class LayerController {
 
     @GetMapping("layers")
     public ResponseEntity<List<LayerResponse>> getGeoJSONLayers() {
-        List<LayerIdAndName> geoJSONLayers = simpleGeoJSONLayerRepository.findAll();
+        List<SmallGeoJSONLayer> geoJSONLayers = simpleGeoJSONLayerRepository.findAll();
         List<LayerResponse> layers = new ArrayList<>();
-        for (LayerIdAndName layer : geoJSONLayers) {
+        for (SmallGeoJSONLayer layer : geoJSONLayers) {
             LayerResponse response = new LayerResponse();
             response.setName(layer.getDisplayName());
             response.setType("GeoJSON");
             response.setPath("/api/layers/get/" + layer.getLayerID());
+
+            // Backwards compat. for admin-ui
+            response.setDisplayName(layer.getDisplayName());
+            response.setLayerID(layer.getLayerID());
+            response.setDescription(layer.getDescription());
             layers.add(response);
         }
         return ResponseEntity.ok(layers);
