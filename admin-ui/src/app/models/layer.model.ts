@@ -1,8 +1,8 @@
 export class Layer {
     layerID?: number;
-    displayName?: string;
+    name?: string;
     description?: string;
-    fileType?: string;
+    type?: string;
     file?: any;
     size?: number;
     geoJSON?: any;

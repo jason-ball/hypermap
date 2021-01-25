@@ -1,6 +1,6 @@
 package hypermap.entity;
 
-public interface SmallGeoJSONLayer {
+public interface MinimalGeoJSONLayer {
 
     int getLayerID();
 

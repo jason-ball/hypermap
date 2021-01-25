@@ -37,8 +37,8 @@
                 <td>
                     <p-tableCheckbox [value]="layer"></p-tableCheckbox>
                 </td>
-                <td>{{layer.displayName}}</td>
-                <td>{{layer.fileType}}</td>
+                <td>{{layer.name}}</td>
+                <td>{{layer.type}}</td>
                 <td>{{layer.size}}</td>
                 <td>
                     <button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-success p-mr-2" (click)="editLayer(layer)"></button>
@@ -58,8 +58,8 @@
     <ng-template pTemplate="content">
         <div class="p-field">
             <label for="displayName">Name</label>
-            <input type="text" pInputText id="displayName" [(ngModel)]="layer.displayName" required autofocus />
-            <small class="p-invalid" *ngIf="submitted && !layer.displayName">Name is required.</small>
+            <input type="text" pInputText id="displayName" [(ngModel)]="layer.name" required autofocus />
+            <small class="p-invalid" *ngIf="submitted && !layer.name">Name is required.</small>
         </div>
         <br/>
         <div class="p-field">

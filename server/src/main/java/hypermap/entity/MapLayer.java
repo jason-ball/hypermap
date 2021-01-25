@@ -14,22 +14,20 @@ import java.io.Serializable;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
-@Table(name = "`MapLayer`")
-@SequenceGenerator(name = "`MapLayer_LayerID_seq`", sequenceName = "`MapLayer_LayerID_seq`", allocationSize = 1)
-@CrossOrigin(origins = "http://localhost:4200")
-public abstract class MapLayer  implements Serializable {
+@Inheritance(strategy = InheritanceType.JOINED)
+@Table(name = "map_layer")
+public class MapLayer {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "`MapLayer_LayerID_seq`")
-    @Column(name = "`LayerID`")
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "layer_id")
     private int layerID;
 
     @JsonProperty
-    @Column(name = "`DisplayName`")
+    @Column(name = "display_name")
     private String displayName;
 
     @JsonProperty
-    @Column(name = "`Description`")
+    @Column(name = "description")
     private String description;
 }

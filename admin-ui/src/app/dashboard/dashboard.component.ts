@@ -23,6 +23,10 @@ export class DashboardComponent implements OnInit {
     submitted: boolean;
     fileObject?: File;
 
+    // ArcGIS Layers
+    arcGISDialog: boolean;
+    arcGISID: string;
+
     //will need to use layerservice
     constructor(private messageService: MessageService, private confirmationService: ConfirmationService, private layerService: LayerService) { }
 
@@ -66,7 +70,7 @@ export class DashboardComponent implements OnInit {
 
     deleteLayer(layer: Layer) {
         this.confirmationService.confirm({
-            message: 'Are you sure you want to delete ' + layer.displayName + '?',
+            message: 'Are you sure you want to delete ' + layer.name + '?',
             header: 'Confirm',
             icon: 'pi pi-exclamation-triangle',
             accept: () => {
@@ -87,7 +91,7 @@ export class DashboardComponent implements OnInit {
     async saveLayer() {
         this.submitted = true;
 
-        if (this.layer.displayName.trim()) {
+        if (this.layer.name.trim()) {
 
             if (this.fileObject) {
                 this.layer.file = await this.toBase64(this.fileObject);
@@ -116,7 +120,7 @@ export class DashboardComponent implements OnInit {
     handleFile(event: any) {
         this.fileObject = event.currentFiles[0];
         // this.layer.geoJSON = event as Layer;
-        this.layer.fileType = "GeoJSON";
+        this.layer.type = "GeoJSON";
     }
 
     findIndexById(id: number): number {
