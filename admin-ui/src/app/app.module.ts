@@ -18,6 +18,7 @@ import {Ripple, RippleModule} from 'primeng/ripple';
 import {InputTextModule} from 'primeng/inputtext';
 import {InputTextareaModule} from 'primeng/inputtextarea';
 import { HttpClientModule, HttpClient } from '@angular/common/http';
+import { DropdownModule } from 'primeng/dropdown';
 
 @NgModule({
   declarations: [
@@ -38,7 +39,8 @@ import { HttpClientModule, HttpClient } from '@angular/common/http';
     RippleModule,
     InputTextModule,
     InputTextareaModule,
-    HttpClientModule
+    HttpClientModule,
+    DropdownModule
   ],
   providers: [ConfirmationService, HttpClientModule],
   bootstrap: [AppComponent]

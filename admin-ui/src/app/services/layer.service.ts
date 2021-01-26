@@ -14,8 +14,12 @@ export class LayerService {
         return this.httpClient.get<Layer[]>('http://localhost:5431/api/layers');
     }
 
-    uploadLayer(data: Layer) {
+    uploadGeoJSONLayer(data: Layer) {
         return this.httpClient.post<any>('http://localhost:5431/api/MapLayer/GeoJSON', data);
+    }
+
+    uploadAGOLLayer(data: Layer) {
+        return this.httpClient.post<any>('http://localhost:5431/api/layers/arcgis', data);
     }
 
     updateLayer(data: Layer) {

@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Layer } from '../models/layer.model';
 import { LayerService } from '../services/layer.service';
 import { TableModule } from 'primeng/table';
-import { ConfirmationService } from 'primeng/api';
+import { ConfirmationService, SelectItem } from 'primeng/api';
 import { MessageService } from 'primeng/api';
 
 
@@ -22,13 +22,21 @@ export class DashboardComponent implements OnInit {
     selectedLayers: Layer[];
     submitted: boolean;
     fileObject?: File;
+    supportedLayerTypes: any[];
+    selectedLayerType: any;
 
     // ArcGIS Layers
     arcGISDialog: boolean;
     arcGISID: string;
 
     //will need to use layerservice
-    constructor(private messageService: MessageService, private confirmationService: ConfirmationService, private layerService: LayerService) { }
+    constructor(private messageService: MessageService, private confirmationService: ConfirmationService, private layerService: LayerService) {
+        this.supportedLayerTypes = [
+            {name: "Make Selection", code: "none"},
+            {name: "GeoJSON", code: "geojson"},
+            {name: "ArcGIS Online", code: "agol"}
+        ]
+    }
 
     ngOnInit() {
         //will need to refactor when making reqs
@@ -45,6 +53,7 @@ export class DashboardComponent implements OnInit {
 
 
     openNew() {
+        this.selectedLayerType = {name: "Make Selection", code: "none"}
         this.layer = {};
         this.submitted = false;
         this.layerDialog = true;
@@ -65,12 +74,13 @@ export class DashboardComponent implements OnInit {
 
     editLayer(layer: Layer) {
         this.layer = { ...layer };
+        this.selectedLayerType = this.supportedLayerTypes.find(type => type.name === this.layer.type);
         this.layerDialog = true;
     }
 
     deleteLayer(layer: Layer) {
         this.confirmationService.confirm({
-            message: 'Are you sure you want to delete ' + layer.name + '?',
+            message: 'Are you sure you want to delete ' + layer.displayName + '?',
             header: 'Confirm',
             icon: 'pi pi-exclamation-triangle',
             accept: () => {
@@ -89,32 +99,62 @@ export class DashboardComponent implements OnInit {
     }
 
     async saveLayer() {
+        
         this.submitted = true;
 
-        if (this.layer.name.trim()) {
+        switch (this.selectedLayerType.code) {
+            case "geojson":
+                if (this.layer.name.trim()) {
 
-            if (this.fileObject) {
-                this.layer.file = await this.toBase64(this.fileObject);
-            }
-            if (this.layer.layerID) {
-                this.layers[this.findIndexById(this.layer.layerID)] = this.layer;
-                this.layerService.updateLayer(this.layer).subscribe(response => this.messageService.add({ severity: 'success', summary: 'Successful', detail: 'Layer Updated', life: 3000 }),
-                    err => console.log(err)
-                );
-            }
-            else {
-                this.layers.push(this.layer);
-                this.layerService.uploadLayer(this.layer).subscribe(response => this.messageService.add({ severity: 'success', summary: 'Successful', detail: 'Layer Created', life: 3000 }),
-                    err => console.log(err)
-                );
-                this.messageService.add({ severity: 'success', summary: 'Successful', detail: 'Layer Created', life: 3000 });
-            }
-
-            this.layers = [...this.layers];
-            this.layerDialog = false;
-            this.layer = {};
-            this.fileObject = null;
+                    if (this.fileObject) {
+                        this.layer.file = await this.toBase64(this.fileObject);
+                    }
+                    if (this.layer.layerID) {
+                        this.layers[this.findIndexById(this.layer.layerID)] = this.layer;
+                        this.layerService.updateLayer(this.layer).subscribe(response => this.messageService.add({ severity: 'success', summary: 'Successful', detail: 'Layer Updated', life: 3000 }),
+                            err => console.log(err)
+                        );
+                    }
+                    else {
+                        this.layers.push(this.layer);
+                        this.layerService.uploadGeoJSONLayer(this.layer).subscribe(response => this.messageService.add({ severity: 'success', summary: 'Successful', detail: 'Layer Created', life: 3000 }),
+                            err => console.log(err)
+                        );
+                        this.messageService.add({ severity: 'success', summary: 'Successful', detail: 'Layer Created', life: 3000 });
+                    }
+        
+                    this.layers = [...this.layers];
+                    this.layerDialog = false;
+                    this.layer = {};
+                    this.fileObject = null;
+                }
+            case "agol":
+                if (this.layer.name.trim()) {
+                    if (this.layer.layerID) {
+                        this.layers[this.findIndexById(this.layer.layerID)] = this.layer;
+                        this.layerService.updateLayer(this.layer).subscribe(response => this.messageService.add({ severity: 'success', summary: 'Successful', detail: 'Layer Updated', life: 3000 }),
+                            err => console.log(err)
+                        );
+                    }
+                    else {
+                        this.layers.push(this.layer);
+                        //TODO: Fix this garbage - need to get rid of redundant endpoint fields
+                        this.layer.displayName = this.layer.name;
+                        this.layer.arcGISID = this.layer.arcgis;
+                        this.layerService.uploadAGOLLayer(this.layer).subscribe(response => this.messageService.add({ severity: 'success', summary: 'Successful', detail: 'Layer Created', life: 3000 }),
+                            err => console.log(err)
+                        );
+                        this.messageService.add({ severity: 'success', summary: 'Successful', detail: 'Layer Created', life: 3000 });
+                    }
+        
+                    this.layers = [...this.layers];
+                    this.layerDialog = false;
+                    this.layer = {};
+                }
         }
+
+
+
     }
 
     handleFile(event: any) {
@@ -142,5 +182,10 @@ export class DashboardComponent implements OnInit {
             reader.onload = () => resolve(reader.result);
             reader.onerror = error => reject(error);
         });
+    }
+
+    onLayerTypeChange(event) {
+        console.log('event :' + event);
+        this.selectedLayerType = event.value;
     }
 }

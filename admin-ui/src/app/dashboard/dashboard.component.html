@@ -9,7 +9,7 @@
         </ng-template>
     </p-toolbar>
 
-    <p-table #dt [value]="layers" [rows]="10" [paginator]="true" [globalFilterFields]="['displayName','country.displayName','representative.displayName','status']"
+    <p-table #dt [value]="layers" [rows]="10" [paginator]="true" [globalFilterFields]="['displayName']"
         [(selection)]="selectedLayers" [rowHover]="true" dataKey="id"
         currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries" [showCurrentPageReport]="true">
         <ng-template pTemplate="caption">
@@ -54,29 +54,50 @@
     </p-table>
 </div>
 
-<p-dialog [(visible)]="layerDialog" [style]="{width: '450px'}" header="Layer Details" [modal]="true" styleClass="p-fluid">
+<p-dialog [(visible)]="layerDialog" [style]="{width: '900px'}" header="Layer Details" [modal]="true" >
     <ng-template pTemplate="content">
-        <div class="p-field">
-            <label for="displayName">Name</label>
-            <input type="text" pInputText id="displayName" [(ngModel)]="layer.name" required autofocus />
-            <small class="p-invalid" *ngIf="submitted && !layer.name">Name is required.</small>
-        </div>
-        <br/>
-        <div class="p-field">
-            <label for="description">Description</label>
-            <textarea id="description" pInputTextarea [(ngModel)]="layer.description" required rows="3" cols="20"></textarea>
-        </div>
-
-        <div class="p-field">
-            <div class="p-formgrid p-grid">
-                <p-fileUpload name="geoJSON" mode="basic" accept=".json,.geojson" label="Upload" chooseLabel="Upload" class="p-mr-2 p-d-inline-block" (onSelect)="handleFile($event)"></p-fileUpload>
+        <div class="form-group">
+            <div class="p-field p-grid">
+                <label for="layerType" class="p-col-fixed" style="width:200">Layer Type</label>
+                <div class="p-col">
+                    <p-dropdown id="layerType" [options]="supportedLayerTypes" [(ngModel)]="selectedLayerType" optionLabel="name" optionValue="code" (onChange)="onLayerTypeChange($event)"></p-dropdown>
+                </div>
             </div>
+
+            <div class="p-field p-grid">
+                <label for="displayName" class="p-col-fixed" style="width:200">Layer Name</label>
+                <div class="p-col">
+                    <input id="displayName" [(ngModel)]="layer.name" style="width:600px" pInputText/>
+                    <small class="p-invalid" *ngIf="submitted && !layer.name">Name is required.</small>
+                </div>
+            </div>
+
+            <div class="p-field p-grid">
+                <label for="description" class="p-col-fixed" style="width:150">Description</label>
+                <div class="p-col">
+                    <textarea id="description" pInputTextarea [(ngModel)]="layer.description" required rows="3" cols="80" pInputTextArea></textarea>
+                </div>
+            </div>
+
+            <div class="p-field" *ngIf="selectedLayerType.code === 'geojson'">
+                <div class="p-formgrid p-grid">
+                    <p-fileUpload name="geoJSON" mode="basic" accept=".json,.geojson" label="Upload" chooseLabel="Upload" class="p-mr-2 p-d-inline-block" (onSelect)="handleFile($event)"></p-fileUpload>
+                </div>
+            </div>
+
+            <div class="p-field p-grid" *ngIf="selectedLayerType.code === 'agol'">
+                <label for="description" class="p-col-fixed" style="width:150">ArcGIS Online Layer ID</label>
+                <div class="p-col">
+                    <textarea id="description" pInputTextarea [(ngModel)]="layer.arcgis" required rows="1" cols="80" pInputTextArea></textarea>
+                </div>
+            </div>
+
         </div>
     </ng-template>
 
     <ng-template pTemplate="footer">
         <button pButton pRipple label="Cancel" icon="pi pi-times" class="p-button-text" (click)="hideDialog()"></button>
-        <button pButton pRipple label="Save" icon="pi pi-check" class="p-button-text" (click)="saveLayer()"></button>
+        <button pButton pRipple label="Save" icon="pi pi-check" class="p-button-text" (click)="saveLayer()" [disabled]="selectedLayerType.code === 'none'"></button>
     </ng-template>
 </p-dialog>
 
