@@ -20,6 +20,8 @@ import Font from 'esri/symbols/Font';
 import LayerList from 'esri/widgets/LayerList';
 import { WelcomeService } from '../services/welcome.service';
 import { LayerService } from '../services/layer.service';
+import Layer from 'esri/layers/Layer';
+import PortalItem from 'esri/portal/PortalItem';
 
 @Component({
   selector: 'app-map',
@@ -38,7 +40,7 @@ export class MapComponent implements OnInit, OnDestroy {
   private _basemap = 'streets';
   private _loaded = false;
   private _view: MapView = null;
-  private layers: Array<GeoJSONLayer> = [];
+  private layers: Array<any> = [];
   hypermapMenuItems: MenuItem[];
 
   get mapLoaded(): boolean {
@@ -177,19 +179,33 @@ export class MapComponent implements OnInit, OnDestroy {
 
     // Add each layer uploaded via admin UI to array of available layers
     this.layerService.getLayers().subscribe(async layers => {
-      layers.forEach(layer => {
-        const newLayer = new GeoJSONLayer({
-          url: `http://localhost:5431${layer.path}`,
-          title: layer.name
-        });
-        this.layers.push(newLayer);
-      });
+      let i;
+      for (i = 0; i < layers.length; i++) {
+        let layer = layers[i];  
+        if (layer.type === 'GeoJSON') {
+            const newLayer = new GeoJSONLayer({
+              url: `http://localhost:5431${layer.path}`,
+              title: layer.name
+            });
+            this.layers.push(newLayer);
+          } else {
+            const newLayer = await Layer.fromPortalItem({
+              portalItem: new PortalItem({
+                id: layer.arcgis
+              })
+            });
+            this.layers.push(newLayer);
+          }
+      }
+      
+      Promise.all;
       // const newLayer = new GeoJSONLayer({
       //   // url: `http://localhost:5431${layer.path}`,
       //   url: 'http://localhost:5431/api/layers/get/61',
       //   title: "xyz"
       // });
       // this.layers.push(newLayer);
+
 
       // Configure the Map
       const mapProperties = {
