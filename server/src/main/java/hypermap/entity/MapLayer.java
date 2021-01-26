@@ -19,7 +19,8 @@ import java.io.Serializable;
 public class MapLayer {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @SequenceGenerator(name="layer_seq", sequenceName="map_layer_layer_id_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "layer_seq")
     @Column(name = "layer_id")
     private int layerID;
 
