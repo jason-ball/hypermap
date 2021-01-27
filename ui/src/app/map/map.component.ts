@@ -22,6 +22,7 @@ import { WelcomeService } from '../services/welcome.service';
 import { LayerService } from '../services/layer.service';
 import Layer from 'esri/layers/Layer';
 import PortalItem from 'esri/portal/PortalItem';
+import Legend from 'esri/widgets/Legend';
 
 @Component({
   selector: 'app-map',
@@ -90,7 +91,8 @@ export class MapComponent implements OnInit, OnDestroy {
         if (layer.type === 'GeoJSON') {
             const newLayer = new GeoJSONLayer({
               url: `http://localhost:5431${layer.path}`,
-              title: layer.name
+              title: layer.name,
+              visible: false
             });
             this.layers.push(newLayer);
           } else {
@@ -99,6 +101,7 @@ export class MapComponent implements OnInit, OnDestroy {
                 id: layer.arcgis
               })
             });
+            newLayer.visible = false;
             this.layers.push(newLayer);
           }
       }
@@ -242,9 +245,14 @@ export class MapComponent implements OnInit, OnDestroy {
         }
       });
 
+      const legend = new Legend({
+        view: this._view
+      });
+
       // Add widgets to view
       this._view.ui.add(layerList, 'top-right');
       this._view.ui.add('mapMenuButton', 'bottom-right');
+      this._view.ui.add(legend, 'bottom-left');
 
 
       this._view.on('click', async (event) => {
