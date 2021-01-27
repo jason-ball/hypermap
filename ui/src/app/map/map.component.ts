@@ -23,6 +23,7 @@ import { LayerService } from '../services/layer.service';
 import Layer from 'esri/layers/Layer';
 import PortalItem from 'esri/portal/PortalItem';
 import Legend from 'esri/widgets/Legend';
+import BasemapToggle from 'esri/widgets/BasemapToggle';
 
 @Component({
   selector: 'app-map',
@@ -249,10 +250,15 @@ export class MapComponent implements OnInit, OnDestroy {
         view: this._view
       });
 
+      var basemapToggle = new BasemapToggle({
+        view: this._view,  // The view that provides access to the map's "streets-vector" basemap
+        nextBasemap: "hybrid"  // Allows for toggling to the "hybrid" basemap
+      });
+
       // Add widgets to view
       this._view.ui.add(layerList, 'top-right');
       this._view.ui.add('mapMenuButton', 'bottom-right');
-      this._view.ui.add(legend, 'bottom-left');
+      this._view.ui.add([legend, basemapToggle], 'bottom-left');
 
 
       this._view.on('click', async (event) => {
