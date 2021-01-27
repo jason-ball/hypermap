@@ -77,7 +77,7 @@ export class MapComponent implements OnInit, OnDestroy {
   openModal() {
     this.welcomeService.openModal();
   }
-  
+
   constructor(private zone: NgZone, private welcomeService: WelcomeService, private layerService: LayerService) { }
 
   async initializeMap() {
@@ -181,7 +181,7 @@ export class MapComponent implements OnInit, OnDestroy {
     this.layerService.getLayers().subscribe(async layers => {
       let i;
       for (i = 0; i < layers.length; i++) {
-        let layer = layers[i];  
+        let layer = layers[i];
         if (layer.type === 'GeoJSON') {
             const newLayer = new GeoJSONLayer({
               url: `http://localhost:5431${layer.path}`,
@@ -197,8 +197,7 @@ export class MapComponent implements OnInit, OnDestroy {
             this.layers.push(newLayer);
           }
       }
-      
-      Promise.all;
+
       // const newLayer = new GeoJSONLayer({
       //   // url: `http://localhost:5431${layer.path}`,
       //   url: 'http://localhost:5431/api/layers/get/61',
@@ -250,7 +249,7 @@ export class MapComponent implements OnInit, OnDestroy {
           }
         }
       });
-      
+
       // Add widgets to view
       this._view.ui.add(layerList, 'top-right');
       this._view.ui.add('mapMenuButton', 'bottom-right');
@@ -270,7 +269,7 @@ export class MapComponent implements OnInit, OnDestroy {
 
       // Done loading the map
       this.mapLoadedEvent.emit(true);
-      
+
       // Welcome Modal
       this.welcomeService.show.subscribe(modalOpen => {
       if (modalOpen) {
