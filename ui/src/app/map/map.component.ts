@@ -84,99 +84,6 @@ export class MapComponent implements OnInit, OnDestroy {
 
     this.initializeWorkers();
 
-    const purpleAirLabels = new LabelClass({
-      labelPlacement: "center-center",
-      minScale: 2500000,
-      labelExpressionInfo: {
-        expression: "Round($feature.CorrectedPM2_5Value, 2)"
-      }
-    });
-
-    const clusteredPurpleAirLabels = new LabelClass({
-      symbol: new TextSymbol({
-        color: 'white',
-        haloColor: "black",
-        haloSize: "1px",
-        font: new Font({
-          family: 'CalciteWebCoreIcons',
-          size: 12
-        })
-      }),
-      labelPlacement: 'center-center',
-      labelExpressionInfo: {
-        expression: '"\ue67a"' // esri-icon-zoom-in-magnifying-glass
-      }
-    })
-
-    const sensorRenderer = new SimpleRenderer({
-      symbol: new SimpleMarkerSymbol({
-        size: 30,
-        color: [0, 244, 255, 1]
-      }),
-      visualVariables: [
-        new ColorVariable({
-          field: "CorrectedPM2_5Value",
-          stops: [
-            { value: 0, color: "#00FF00" },
-            { value: 50, color: "#FFFF00" },
-            { value: 150, color: "#FF0000" }
-          ]
-        })
-      ]
-    });
-
-    const sensorPopupFields = new FieldsContent({
-      fieldInfos: [
-        new FieldInfo({
-          label: 'PM2.5 (Corrected)',
-          fieldName: 'CorrectedPM2_5Value'
-        }),
-        new FieldInfo({
-          label: 'PM2.5',
-          fieldName: 'pm2.5'
-        }),
-        new FieldInfo({
-          label: 'Correction Method',
-          fieldName: 'CorrectionMethod'
-        }),
-        new FieldInfo({
-          label: 'Last Updated',
-          fieldName: 'expression/sensorLastUpdated',
-          format: new FieldInfoFormat({
-            dateFormat: 'day-short-month-year-short-time'
-          }),
-        })
-      ]
-    })
-
-    const sensorDetailTemplate = new PopupTemplate({
-      title: "{name}",
-      content: [sensorPopupFields],
-      expressionInfos: [
-        new ExpressionInfo({
-          name: 'sensorLastUpdated',
-          title: 'Last Updated',
-          expression: '$feature.last_seen * 1000'
-        })
-      ]
-    });
-
-    // Create and push the layer for PurpleAir sensors
-    const purpleAirLayer = new GeoJSONLayer({
-      url: "https://k5emdaxun6.execute-api.us-east-1.amazonaws.com/dev/purpleair",
-      title: 'PurpleAir Sensors',
-      popupTemplate: sensorDetailTemplate,
-      renderer: sensorRenderer,
-      labelingInfo: [purpleAirLabels],
-      featureReduction: new FeatureReductionCluster({
-        clusterRadius: 80,
-        clusterMinSize: 30,
-        clusterMaxSize: 30,
-        labelingInfo: [clusteredPurpleAirLabels]
-      })
-    });
-    this.layers.push(purpleAirLayer);
-
     // Add each layer uploaded via admin UI to array of available layers
     this.layerService.getLayers().subscribe(async layers => {
       for (const layer of layers) {
@@ -196,12 +103,98 @@ export class MapComponent implements OnInit, OnDestroy {
           }
       }
 
-      // const newLayer = new GeoJSONLayer({
-      //   // url: `http://localhost:5431${layer.path}`,
-      //   url: 'http://localhost:5431/api/layers/get/61',
-      //   title: "xyz"
-      // });
-      // this.layers.push(newLayer);
+      const purpleAirLabels = new LabelClass({
+        labelPlacement: "center-center",
+        minScale: 2500000,
+        labelExpressionInfo: {
+          expression: "Round($feature.CorrectedPM2_5Value, 2)"
+        }
+      });
+
+      const clusteredPurpleAirLabels = new LabelClass({
+        symbol: new TextSymbol({
+          color: 'white',
+          haloColor: "black",
+          haloSize: "1px",
+          font: new Font({
+            family: 'CalciteWebCoreIcons',
+            size: 12
+          })
+        }),
+        labelPlacement: 'center-center',
+        labelExpressionInfo: {
+          expression: '"\ue67a"' // esri-icon-zoom-in-magnifying-glass
+        }
+      })
+
+      const sensorRenderer = new SimpleRenderer({
+        symbol: new SimpleMarkerSymbol({
+          size: 30,
+          color: [0, 244, 255, 1]
+        }),
+        visualVariables: [
+          new ColorVariable({
+            field: "CorrectedPM2_5Value",
+            stops: [
+              { value: 0, color: "#00FF00" },
+              { value: 50, color: "#FFFF00" },
+              { value: 150, color: "#FF0000" }
+            ]
+          })
+        ]
+      });
+
+      const sensorPopupFields = new FieldsContent({
+        fieldInfos: [
+          new FieldInfo({
+            label: 'PM2.5 (Corrected)',
+            fieldName: 'CorrectedPM2_5Value'
+          }),
+          new FieldInfo({
+            label: 'PM2.5',
+            fieldName: 'pm2.5'
+          }),
+          new FieldInfo({
+            label: 'Correction Method',
+            fieldName: 'CorrectionMethod'
+          }),
+          new FieldInfo({
+            label: 'Last Updated',
+            fieldName: 'expression/sensorLastUpdated',
+            format: new FieldInfoFormat({
+              dateFormat: 'day-short-month-year-short-time'
+            }),
+          })
+        ]
+      })
+
+      const sensorDetailTemplate = new PopupTemplate({
+        title: "{name}",
+        content: [sensorPopupFields],
+        expressionInfos: [
+          new ExpressionInfo({
+            name: 'sensorLastUpdated',
+            title: 'Last Updated',
+            expression: '$feature.last_seen * 1000'
+          })
+        ]
+      });
+
+      // Create and push the layer for PurpleAir sensors
+      const purpleAirLayer = new GeoJSONLayer({
+        url: "https://k5emdaxun6.execute-api.us-east-1.amazonaws.com/dev/purpleair",
+        title: 'PurpleAir Sensors',
+        popupTemplate: sensorDetailTemplate,
+        renderer: sensorRenderer,
+        labelingInfo: [purpleAirLabels],
+        featureReduction: new FeatureReductionCluster({
+          clusterRadius: 80,
+          clusterMinSize: 30,
+          clusterMaxSize: 30,
+          labelingInfo: [clusteredPurpleAirLabels]
+        })
+      });
+      this.layers.push(purpleAirLayer);
 
 
       // Configure the Map
