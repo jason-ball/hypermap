@@ -222,6 +222,7 @@ export class MapComponent implements OnInit, OnDestroy {
       // Add LayerList Widget
       const layerList = new LayerList({
         view: this._view,
+        selectionEnabled: true,
         // executes for each ListItem in the LayerList
         listItemCreatedFunction: function (event) {
           // The event object contains properties of the
