@@ -250,9 +250,9 @@ export class MapComponent implements OnInit, OnDestroy {
         view: this._view
       });
 
-      var basemapToggle = new BasemapToggle({
-        view: this._view,  // The view that provides access to the map's "streets-vector" basemap
-        nextBasemap: "hybrid"  // Allows for toggling to the "hybrid" basemap
+      const basemapToggle = new BasemapToggle({
+        view: this._view,
+        nextBasemap: "hybrid"
       });
 
       // Add widgets to view
