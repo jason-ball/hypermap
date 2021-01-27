@@ -179,9 +179,7 @@ export class MapComponent implements OnInit, OnDestroy {
 
     // Add each layer uploaded via admin UI to array of available layers
     this.layerService.getLayers().subscribe(async layers => {
-      let i;
-      for (i = 0; i < layers.length; i++) {
-        let layer = layers[i];
+      for (const layer of layers) {
         if (layer.type === 'GeoJSON') {
             const newLayer = new GeoJSONLayer({
               url: `http://localhost:5431${layer.path}`,
