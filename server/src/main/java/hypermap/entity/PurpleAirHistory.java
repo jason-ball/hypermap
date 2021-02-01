@@ -16,27 +16,31 @@ import java.util.Date;
 public class PurpleAirHistory {
     @Id
     @Column(name = "purpleair_id")
-    int purpleAirID;
+    private int purpleAirID;
 
     @Id
     @Column(name = "time")
-    Date time;
+    private Date time;
 
     @Column(name = "pm2_5")
-    double pm25;
+    private double pm25;
 
     @Column(name = "temperature")
-    Integer temperature;    // Nullable
+    private Integer temperature;    // Nullable
 
     @Column(name = "humidity")
-    Integer humidity;       // Nullable
+    private Integer humidity;       // Nullable
 
     @Column(name = "corrected_pm2_5")
-    Double correctedPM25;   // Nullable
+    private Double correctedPM25;   // Nullable
+
+    @Column(name = "correction_method")
+    private String correctionMethod;
 
     @Column(name = "latitude")
-    double latitude;
+    private double latitude;
 
     @Column(name = "longitude")
-    double longitude;
+    private double longitude;
+
 }
