@@ -1,7 +1,6 @@
 package hypermap.entity;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.sun.istack.Nullable;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -27,11 +26,17 @@ public class PurpleAirHistory {
     double pm25;
 
     @Column(name = "temperature")
-    Integer temperature;
+    Integer temperature;    // Nullable
 
     @Column(name = "humidity")
-    Integer humidity;
+    Integer humidity;       // Nullable
 
     @Column(name = "corrected_pm2_5")
-    Double correctedPM25;
+    Double correctedPM25;   // Nullable
+
+    @Column(name = "latitude")
+    double latitude;
+
+    @Column(name = "longitude")
+    double longitude;
 }
