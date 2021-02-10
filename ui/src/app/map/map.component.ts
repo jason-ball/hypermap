@@ -24,6 +24,9 @@ import Layer from 'esri/layers/Layer';
 import PortalItem from 'esri/portal/PortalItem';
 import Legend from 'esri/widgets/Legend';
 import BasemapToggle from 'esri/widgets/BasemapToggle';
+import Field from 'esri/layers/support/Field';
+import IdentityManager from 'esri/identity/IdentityManager';
+import { TokenService } from '../services/token.service';
 
 @Component({
   selector: 'app-map',
@@ -80,11 +83,17 @@ export class MapComponent implements OnInit, OnDestroy {
     this.welcomeService.openModal();
   }
 
-  constructor(private zone: NgZone, private welcomeService: WelcomeService, private layerService: LayerService) { }
+  constructor(private zone: NgZone, private welcomeService: WelcomeService, private layerService: LayerService, private tokenService: TokenService) { }
 
   async initializeMap() {
 
     this.initializeWorkers();
+
+    const token = await this.tokenService.getToken().toPromise()
+    IdentityManager.registerToken({
+      token: token.access_token,
+      server: 'https://www.arcgis.com/sharing/rest'
+    })
 
     // Add each layer uploaded via admin UI to array of available layers
     this.layerService.getLayers().subscribe(async layers => {
@@ -140,9 +149,36 @@ export class MapComponent implements OnInit, OnDestroy {
           new ColorVariable({
             field: "CorrectedPM2_5Value",
             stops: [
-              { value: 0, color: "#00FF00" },
-              { value: 50, color: "#FFFF00" },
-              { value: 150, color: "#FF0000" }
+              {
+                value: 0,
+                color: "#80E235",
+                label: 'Good'
+              },
+              {
+                value: 12.1,
+                color: "#FFFF3C",
+                label: 'Moderate'
+              },
+              {
+                value: 35.5,
+                color: "#E37D1C",
+                label: 'Unhealthy for sensitive groups'
+              },
+              {
+                value: 55.5,
+                color: "#DA0300",
+                label: 'Unhealthy'
+              },
+              {
+                value: 150.5,
+                color: "#82004B",
+                label: 'Very Unhealthy'
+              },
+              {
+                value: 250.5,
+                color: "#6B0027",
+                label: 'Hazardous'
+              }
             ]
           })
         ]
@@ -188,6 +224,7 @@ export class MapComponent implements OnInit, OnDestroy {
       const purpleAirLayer = new GeoJSONLayer({
         url: "https://k5emdaxun6.execute-api.us-east-1.amazonaws.com/dev/purpleair",
         title: 'PurpleAir Sensors',
+        copyright: 'PurpleAir',
         popupTemplate: sensorDetailTemplate,
         renderer: sensorRenderer,
         labelingInfo: [purpleAirLabels],
@@ -196,7 +233,54 @@ export class MapComponent implements OnInit, OnDestroy {
           clusterMinSize: 30,
           clusterMaxSize: 30,
           labelingInfo: [clusteredPurpleAirLabels]
-        })
+        }),
+        fields: [
+          new Field({
+            name: 'sensor_index',
+            alias: 'Sensor ID',
+            type: 'integer'
+          }),
+          new Field({
+            name: 'name',
+            alias: 'Sensor Name',
+            type: 'string'
+          }),
+          new Field({
+            name: 'latitude',
+            alias: 'Latitude',
+            type: 'double'
+          }),
+          new Field({
+            name: 'longitude',
+            alias: 'Longitude',
+            type: 'double'
+          }),
+          new Field({
+            name: 'pm2.5',
+            alias: 'Particulate Matter in the Air (micrograms per cubic meter)',
+            type: 'double'
+          }),
+          new Field({
+            name: 'humidity',
+            alias: 'Relative Humidity',
+            type: 'integer'
+          }),
+          new Field({
+            name: 'temperature',
+            alias: 'Temperature',
+            type: 'integer'
+          }),
+          new Field({
+            name: 'CorrectedPM2_5Value',
+            alias: 'Particulate Matter in the Air (µg/m³)',
+            type: 'double'
+          }),
+          new Field({
+            name: 'CorrectionMethod',
+            alias: 'Correction Method',
+            type: 'string'
+          })
+        ]
       });
       this.layers.push(purpleAirLayer);
 
