@@ -2,24 +2,25 @@ package hypermap.controller;
 
 import hypermap.entity.ArcGISLayer;
 import hypermap.entity.GeoJSONLayer;
-import hypermap.entity.MapLayer;
 import hypermap.entity.MinimalGeoJSONLayer;
 import hypermap.repository.ArcGISLayerRepository;
 import hypermap.repository.GeoJSONLayerRepository;
 import hypermap.repository.MapLayerRepository;
 import hypermap.requestbody.AdminUIArcGISRequest;
 import hypermap.requestbody.AdminUILayerUploadRequest;
+import hypermap.requestbody.ArcGISTokenRequest;
+import hypermap.response.ArcGISToken;
 import hypermap.response.LayerResponse;
 import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.reactive.function.BodyInserters;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api")
@@ -188,5 +189,23 @@ public class LayerController {
     @DeleteMapping(path = "/layers/{id}")
     public void deleteGeoJson(@PathVariable(value = "id") String id) {
         mapLayerRepository.deleteById(Integer.valueOf(id));
+    }
+
+    @GetMapping(path = "/arcgis-token")
+    public ResponseEntity<String> getArcGISToken() {
+        WebClient webClient = WebClient.create("https://www.arcgis.com");
+        ArcGISTokenRequest request = new ArcGISTokenRequest();
+        request.setClientID("client");
+        request.setClientSecret("secret");
+
+        Mono<String> token = webClient.post()
+                .uri("/sharing/rest/oauth2/token?")
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .body(BodyInserters.fromFormData(request.toMap()))
+                .retrieve()
+                .bodyToMono(String.class);
+
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(token.block());
     }
 }
