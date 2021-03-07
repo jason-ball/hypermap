@@ -3,4 +3,5 @@ export class Layer {
     type: string;
     path: string;
     arcgis: string;
+    description: string;
 }

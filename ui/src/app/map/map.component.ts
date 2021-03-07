@@ -24,6 +24,7 @@ import Layer from 'esri/layers/Layer';
 import PortalItem from 'esri/portal/PortalItem';
 import Legend from 'esri/widgets/Legend';
 import BasemapToggle from 'esri/widgets/BasemapToggle';
+import { DetailsModalComponent } from '../details-modal/details-modal.component';
 
 @Component({
   selector: 'app-map',
@@ -43,6 +44,9 @@ export class MapComponent implements OnInit, OnDestroy {
   private _loaded = false;
   private _view: MapView = null;
   private layers: Array<any> = [];
+  private layerDescriptions: Array<any> = [];
+  private showDetails: boolean = false;
+  private curDetails: any;
   hypermapMenuItems: MenuItem[];
 
   get mapLoaded(): boolean {
@@ -93,7 +97,8 @@ export class MapComponent implements OnInit, OnDestroy {
             const newLayer = new GeoJSONLayer({
               url: `http://localhost:5431${layer.path}`,
               title: layer.name,
-              visible: false
+              visible: false,
+              
             });
             this.layers.push(newLayer);
           } else {
@@ -102,6 +107,16 @@ export class MapComponent implements OnInit, OnDestroy {
                 id: layer.arcgis
               })
             });
+            let portalItem:any = newLayer.get('portalItem');
+            let portalItemDesc = portalItem.get('description');
+            let portalAttrib = portalItem.get('accessInformation');
+            let layerDesc = {
+              "uid": newLayer.get('uid'),
+              "name": layer.name,
+              "description": layer.description == null ? portalItemDesc : layer.description,
+              "attribution": portalAttrib
+            }
+            this.layerDescriptions.push(layerDesc)
             newLayer.visible = false;
             this.layers.push(newLayer);
           }
@@ -237,14 +252,51 @@ export class MapComponent implements OnInit, OnDestroy {
             // open the list item in the LayerList
             item.open = true;
             // set an action for zooming to the full extent of the layer
-            item.actionsSections = [[{
-              title: "Go to full extent",
-              className: "esri-icon-zoom-out-fixed",
-              id: "full-extent"
-            }]];
+            item.actionsSections = [      [
+              {
+                title: "Go to full extent",
+                className: "esri-icon-zoom-out-fixed",
+                id: "full-extent"
+              },
+              {
+                title: "Layer information",
+                className: "esri-icon-description",
+                id: "information"
+              }
+            ],
+            [
+              {
+                title: "Increase opacity",
+                className: "esri-icon-up",
+                id: "increase-opacity"
+              },
+              {
+                title: "Decrease opacity",
+                className: "esri-icon-down",
+                id: "decrease-opacity"
+              }
+            ]];
           }
         }
       });
+    console.log(this.layers)
+    layerList.on("trigger-action", async (event) => {
+      // // The layer visible in the view at the time of the trigger.
+      // var visibleLayer = USALayer.visible ? USALayer : censusLayer;
+
+      // Determine layer selected by user and display details modal
+      let layer = event.item.layer;
+      this.curDetails = this.layerDescriptions.find(x => x.uid == layer.get('uid'));
+      debugger
+      this.showDetails = true;
+
+      //Define custom layer list actions here
+      switch(event.action.id) {
+        case "information":
+          console.log(`showing layer information ${this.layerDescriptions}`);
+         
+      }
+    });
 
       const legend = new Legend({
         view: this._view
@@ -258,8 +310,9 @@ export class MapComponent implements OnInit, OnDestroy {
       // Add widgets to view
       this._view.ui.add(layerList, 'top-right');
       this._view.ui.add('mapMenuButton', 'bottom-right');
+      this._view.ui.add('detailsModal', 'center')
       this._view.ui.add([legend, basemapToggle], 'bottom-left');
-
+      
 
       this._view.on('click', async (event) => {
         const r = await this._view.hitTest(event.screenPoint);

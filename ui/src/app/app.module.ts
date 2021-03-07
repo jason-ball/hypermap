@@ -14,10 +14,11 @@ import { SharedModule } from "primeng/api";
 import { MenuModule } from "primeng/menu";
 
 import { NgIdleKeepaliveModule } from "@ng-idle/keepalive";
+import { DetailsModalComponent } from './details-modal/details-modal.component';
 
 
 @NgModule({
-  declarations: [AppComponent, MapComponent, WelcomeComponent],
+  declarations: [AppComponent, MapComponent, WelcomeComponent, DetailsModalComponent],
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
