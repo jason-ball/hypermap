@@ -281,19 +281,30 @@ export class MapComponent implements OnInit, OnDestroy {
       });
     console.log(this.layers)
     layerList.on("trigger-action", async (event) => {
-      // // The layer visible in the view at the time of the trigger.
-      // var visibleLayer = USALayer.visible ? USALayer : censusLayer;
-
-      // Determine layer selected by user and display details modal
-      let layer = event.item.layer;
-      this.curDetails = this.layerDescriptions.find(x => x.uid == layer.get('uid'));      
-      this.showDetails = true;
-
       //Define custom layer list actions here
       switch(event.action.id) {
-        case "information":
+        case "information": {
+          // Determine layer selected by user and display details modal
           console.log(`showing layer information ${this.layerDescriptions}`);
-         
+          let layer = event.item.layer;
+          this.curDetails = this.layerDescriptions.find(x => x.uid == layer.get('uid'));      
+          this.showDetails = true;
+          break;
+        }
+        case "increase-opacity": {
+          let layer = event.item.layer;
+          if (layer.opacity < 1)
+            layer.opacity += 0.1;
+
+          break;
+        }
+        case "decrease-opacity": {
+          let layer = event.item.layer;
+          if (layer.opacity > 0)
+                layer.opacity -= 0.1;
+
+          break;
+        }
       }
     });
 
