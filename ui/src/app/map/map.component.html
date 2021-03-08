@@ -7,5 +7,5 @@
 </div>
 
 <div id="detailsModal" class="esri-widget esri-component" height='500' width='1000' background-color="white">
-  <div><app-details-modal *ngIf="showDetails" [details]="curDetails"></app-details-modal></div>
+  <div><app-details-modal *ngIf="showDetails" [details]="curDetails" (closeModal)="closeModal($event)"></app-details-modal></div>
 </div>

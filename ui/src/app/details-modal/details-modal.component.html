@@ -1,4 +1,4 @@
-<p-dialog [(visible)]="display" [breakpoints]="{'960px': '75vw', '640px': '100vw'}" [style]="{width: '50vw'}">
+<p-dialog [(visible)]="display" (onHide)="onClose($event)" [style]="{width: '50vw'}">
     <h1>Layer: {{details.name}}</h1>
     <h4>Attribution: {{details.attribution}}</h4>
     <div [innerHTML]="details.description">

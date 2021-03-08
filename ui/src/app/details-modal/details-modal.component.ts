@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 
 @Component({
     selector: 'app-details-modal',
@@ -7,6 +7,7 @@ import { Component, Input, OnInit } from '@angular/core';
 })
 export class DetailsModalComponent implements OnInit {
     @Input() details: any;
+    @Output() closeModal = new EventEmitter<boolean>();
     display: boolean = true;
     name: string;
     attribution: string;
@@ -14,5 +15,9 @@ export class DetailsModalComponent implements OnInit {
 
     ngOnInit() {
         console.log(`DetailsModal OnInit ${this.details}`);
+    }
+
+    onClose($event: any) {
+        this.closeModal.emit(true);
     }
 }

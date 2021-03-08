@@ -286,8 +286,7 @@ export class MapComponent implements OnInit, OnDestroy {
 
       // Determine layer selected by user and display details modal
       let layer = event.item.layer;
-      this.curDetails = this.layerDescriptions.find(x => x.uid == layer.get('uid'));
-      debugger
+      this.curDetails = this.layerDescriptions.find(x => x.uid == layer.get('uid'));      
       this.showDetails = true;
 
       //Define custom layer list actions here
@@ -385,9 +384,9 @@ export class MapComponent implements OnInit, OnDestroy {
     };
   }
 
-  // getLayers(): Array<GeoJSONLayer> {
-  //   this.layerService.getLayers().subscribe
-  // }
+  closeModal($event: any) {
+    this.showDetails = false;
+  }
 
   ngOnInit() {
     /* // For more info on change detection handling see: https://github.com/Esri/angular-cli-esri-map/issues/70
