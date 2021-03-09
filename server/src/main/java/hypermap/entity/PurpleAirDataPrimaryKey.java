@@ -7,7 +7,7 @@ import java.io.Serializable;
 import java.util.Date;
 
 @Data
-public class PurpleAirHistoryPrimaryKey implements Serializable {
+public class PurpleAirDataPrimaryKey implements Serializable {
     @Column(name = "purpleair_id")
     private int purpleAirID;
 

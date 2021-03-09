@@ -9,11 +9,11 @@ import java.util.Date;
 
 @Entity
 @Table(name = "purpleair_history")
-@IdClass(PurpleAirHistoryPrimaryKey.class)
+@IdClass(PurpleAirDataPrimaryKey.class)
 @Getter
 @NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class PurpleAirHistory {
+public class PurpleAirData {
     @Id
     @Column(name = "purpleair_id")
     private int purpleAirID;
