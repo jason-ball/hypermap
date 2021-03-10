@@ -50,11 +50,10 @@ export class MapComponent implements OnInit, OnDestroy {
   private _loaded = false;
   private _view: MapView = null;
   private layers: Array<any> = [];
-  private currentColorScheme: ColorScheme
   private defaultColors = [Color.fromHex('#80E235'), Color.fromHex('#FFFF3C'), Color.fromHex('#E37D1C'), Color.fromHex('#DA0300'), Color.fromHex('#82004B'), Color.fromHex('#6B0027')]
-  private deutanColors = getColorSchemeByName('Purple 2').colorsForClassBreaks[5].colors;
-  private protanColors = getColorSchemeByName('Purple 4').colorsForClassBreaks[5].colors;
-  private tritanColors = getColorSchemeByName('Red 5').colorsForClassBreaks[5].colors;
+  private deutanColors = getColorSchemeByName('Red and Gray 4').colorsForClassBreaks[5].colors.reverse();
+  private protanColors = getColorSchemeByName('Blue and Gray 2').colorsForClassBreaks[5].colors.reverse();
+  private tritanColors = getColorSchemeByName('Red and Gray 6').colorsForClassBreaks[5].colors.reverse();
   private activeColors: Color[];
   hypermapMenuItems: MenuItem[];
 
