@@ -10,3 +10,19 @@ body {
 .p-dialog-title {
   width: 100% !important;
 }
+
+.esri-view-width-xlarge .esri-popup__main-container,
+.esri-view-width-large .esri-popup__main-container,
+.esri-view-width-medium .esri-popup__main-container
+{
+  max-height: 600px !important;
+  width: 600px !important;
+}
+
+canvas:focus {
+  outline: none;
+}
+
+.esri-view .esri-view-surface--inset-outline:focus::after {
+  outline: none !important;
+}

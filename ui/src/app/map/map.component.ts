@@ -27,6 +27,9 @@ import BasemapToggle from 'esri/widgets/BasemapToggle';
 import Field from 'esri/layers/support/Field';
 import IdentityManager from 'esri/identity/IdentityManager';
 import { TokenService } from '../services/token.service';
+import CustomContent from 'esri/popup/content/CustomContent';
+import buildChart from './chart';
+import { PurpleairService } from '../services/purpleair.service';
 
 @Component({
   selector: 'app-map',
@@ -83,7 +86,7 @@ export class MapComponent implements OnInit, OnDestroy {
     this.welcomeService.openModal();
   }
 
-  constructor(private zone: NgZone, private welcomeService: WelcomeService, private layerService: LayerService, private tokenService: TokenService) { }
+  constructor(private zone: NgZone, private welcomeService: WelcomeService, private layerService: LayerService, private tokenService: TokenService, private purpleAirService: PurpleairService) { }
 
   async initializeMap() {
 
@@ -120,7 +123,7 @@ export class MapComponent implements OnInit, OnDestroy {
         labelPlacement: "center-center",
         minScale: 2500000,
         labelExpressionInfo: {
-          expression: "Round($feature.CorrectedPM2_5Value, 2)"
+          expression: "Round($feature.corrected_pm2_5, 2)"
         }
       });
 
@@ -147,7 +150,7 @@ export class MapComponent implements OnInit, OnDestroy {
         }),
         visualVariables: [
           new ColorVariable({
-            field: "CorrectedPM2_5Value",
+            field: "corrected_pm2_5",
             stops: [
               {
                 value: 0,
@@ -188,41 +191,48 @@ export class MapComponent implements OnInit, OnDestroy {
         fieldInfos: [
           new FieldInfo({
             label: 'PM2.5 (Corrected)',
-            fieldName: 'CorrectedPM2_5Value'
+            fieldName: 'corrected_pm2_5'
           }),
           new FieldInfo({
             label: 'PM2.5',
-            fieldName: 'pm2.5'
+            fieldName: 'pm2_5'
           }),
           new FieldInfo({
             label: 'Correction Method',
-            fieldName: 'CorrectionMethod'
+            fieldName: 'correction_method'
           }),
-          new FieldInfo({
+          /* new FieldInfo({
             label: 'Last Updated',
             fieldName: 'expression/sensorLastUpdated',
             format: new FieldInfoFormat({
               dateFormat: 'day-short-month-year-short-time'
             }),
-          })
+          }) */
         ]
       })
 
+      const graphContent = new CustomContent({
+        outFields: ['*'],
+        creator: (graphic) => buildChart(graphic, this.purpleAirService)
+      });
+
       const sensorDetailTemplate = new PopupTemplate({
         title: "{name}",
-        content: [sensorPopupFields],
-        expressionInfos: [
+        content: [sensorPopupFields, graphContent],
+        /* expressionInfos: [
           new ExpressionInfo({
             name: 'sensorLastUpdated',
             title: 'Last Updated',
-            expression: '$feature.last_seen * 1000'
+            expression: '$feature.time / 1000'
           })
-        ]
+        ] */
       });
 
       // Create and push the layer for PurpleAir sensors
       const purpleAirLayer = new GeoJSONLayer({
-        url: "https://k5emdaxun6.execute-api.us-east-1.amazonaws.com/dev/purpleair",
+        // Thanks Lambda, you served us well
+        // url: "https://k5emdaxun6.execute-api.us-east-1.amazonaws.com/dev/purpleair",
+        url: 'http://localhost:5431/api/purpleair/geojson',
         title: 'PurpleAir Sensors',
         copyright: 'PurpleAir',
         popupTemplate: sensorDetailTemplate,
@@ -236,7 +246,7 @@ export class MapComponent implements OnInit, OnDestroy {
         }),
         fields: [
           new Field({
-            name: 'sensor_index',
+            name: 'purpleair_id',
             alias: 'Sensor ID',
             type: 'integer'
           }),
@@ -246,17 +256,7 @@ export class MapComponent implements OnInit, OnDestroy {
             type: 'string'
           }),
           new Field({
-            name: 'latitude',
-            alias: 'Latitude',
-            type: 'double'
-          }),
-          new Field({
-            name: 'longitude',
-            alias: 'Longitude',
-            type: 'double'
-          }),
-          new Field({
-            name: 'pm2.5',
+            name: 'pm2_5',
             alias: 'Particulate Matter in the Air (micrograms per cubic meter)',
             type: 'double'
           }),
@@ -271,12 +271,12 @@ export class MapComponent implements OnInit, OnDestroy {
             type: 'integer'
           }),
           new Field({
-            name: 'CorrectedPM2_5Value',
+            name: 'corrected_pm2_5',
             alias: 'Particulate Matter in the Air (µg/m³)',
             type: 'double'
           }),
           new Field({
-            name: 'CorrectionMethod',
+            name: 'correction_method',
             alias: 'Correction Method',
             type: 'string'
           })
@@ -367,6 +367,7 @@ export class MapComponent implements OnInit, OnDestroy {
           center: [-77.46576684324452, 37.56118644444622],
           zoom: 10
         });
+        this._view.popup.close();
       }
     });
     })
