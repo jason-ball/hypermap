@@ -6,11 +6,9 @@ import MapView from "esri/views/MapView";
 import esriConfig from "esri/config";
 import GeoJSONLayer from 'esri/layers/GeoJSONLayer';
 import PopupTemplate from 'esri/PopupTemplate';
-import SimpleRenderer from 'esri/renderers/SimpleRenderer';
 import ClassBreaksRenderer from 'esri/renderers/ClassBreaksRenderer';
 import ClassBreakInfo from 'esri/renderers/support/ClassBreakInfo'
 import SimpleMarkerSymbol from 'esri/symbols/SimpleMarkerSymbol';
-import ColorVariable from 'esri/renderers/visualVariables/ColorVariable';
 import LabelClass from 'esri/layers/support/LabelClass';
 import FieldInfo from 'esri/popup/FieldInfo';
 import FieldsContent from 'esri/popup/content/FieldsContent';
@@ -57,6 +55,7 @@ export class MapComponent implements OnInit, OnDestroy {
   private deutanColors = getColorSchemeByName('Purple 2').colorsForClassBreaks[5].colors;
   private protanColors = getColorSchemeByName('Purple 4').colorsForClassBreaks[5].colors;
   private tritanColors = getColorSchemeByName('Red 5').colorsForClassBreaks[5].colors;
+  private activeColors: Color[];
   hypermapMenuItems: MenuItem[];
 
   get mapLoaded(): boolean {
@@ -152,50 +151,6 @@ export class MapComponent implements OnInit, OnDestroy {
       }
     })
 
-    const sensorRenderer = new SimpleRenderer({
-      symbol: new SimpleMarkerSymbol({
-        size: 30,
-        color: [0, 244, 255, 1]
-      }),
-      visualVariables: [
-        new ColorVariable({
-          field: "corrected_pm2_5",
-          stops: [
-            {
-              value: 0,
-              color: "#80E235",
-              label: 'Good'
-            },
-            {
-              value: 12.1,
-              color: "#FFFF3C",
-              label: 'Moderate'
-            },
-            {
-              value: 35.5,
-              color: "#E37D1C",
-              label: 'Unhealthy for sensitive groups'
-            },
-            {
-              value: 55.5,
-              color: "#DA0300",
-              label: 'Unhealthy'
-            },
-            {
-              value: 150.5,
-              color: "#82004B",
-              label: 'Very Unhealthy'
-            },
-            {
-              value: 250.5,
-              color: "#6B0027",
-              label: 'Hazardous'
-            }
-          ]
-        })
-      ]
-    });
-
     const purpleAirRenderer = new ClassBreaksRenderer({
       field: 'corrected_pm2_5',
       classBreakInfos: [
@@ -282,7 +237,7 @@ export class MapComponent implements OnInit, OnDestroy {
 
     const graphContent = new CustomContent({
       outFields: ['*'],
-      creator: (graphic) => buildChart(graphic, this.purpleAirService)
+      creator: (graphic) => buildChart(graphic, this.purpleAirService, this.activeColors)
     });
 
     const sensorDetailTemplate = new PopupTemplate({
@@ -448,6 +403,7 @@ export class MapComponent implements OnInit, OnDestroy {
         default:
           break;
       }
+      this.activeColors = colors;
       const renderer = purpleAirRenderer.clone();
       renderer.classBreakInfos.forEach((info, index) => {
         info.symbol.color = colors[index];
@@ -547,6 +503,7 @@ export class MapComponent implements OnInit, OnDestroy {
         }
       }
     ]
+    this.activeColors = this.defaultColors;
   }
 
   ngOnDestroy() {
