@@ -26,3 +26,22 @@ canvas:focus {
 .esri-view .esri-view-surface--inset-outline:focus::after {
   outline: none !important;
 }
+
+.esri-legend__layer-cell--info {
+  max-width: 350px !important;
+}
+
+.esri-ui-corner .esri-component.esri-widget--panel {
+  width: 350px !important;
+  max-height: 640px;
+}
+
+#color-blind-toggle {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+#color-blind-toggle label {
+  padding-right: 4px;
+}

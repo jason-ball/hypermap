@@ -7,13 +7,13 @@ import esriConfig from "esri/config";
 import GeoJSONLayer from 'esri/layers/GeoJSONLayer';
 import PopupTemplate from 'esri/PopupTemplate';
 import SimpleRenderer from 'esri/renderers/SimpleRenderer';
+import ClassBreaksRenderer from 'esri/renderers/ClassBreaksRenderer';
+import ClassBreakInfo from 'esri/renderers/support/ClassBreakInfo'
 import SimpleMarkerSymbol from 'esri/symbols/SimpleMarkerSymbol';
 import ColorVariable from 'esri/renderers/visualVariables/ColorVariable';
 import LabelClass from 'esri/layers/support/LabelClass';
 import FieldInfo from 'esri/popup/FieldInfo';
 import FieldsContent from 'esri/popup/content/FieldsContent';
-import FieldInfoFormat from 'esri/popup/support/FieldInfoFormat';
-import ExpressionInfo from 'esri/popup/ExpressionInfo';
 import FeatureReductionCluster from 'esri/layers/support/FeatureReductionCluster';
 import TextSymbol from 'esri/symbols/TextSymbol';
 import Font from 'esri/symbols/Font';
@@ -28,8 +28,11 @@ import Field from 'esri/layers/support/Field';
 import IdentityManager from 'esri/identity/IdentityManager';
 import { TokenService } from '../services/token.service';
 import CustomContent from 'esri/popup/content/CustomContent';
+import { byName as getColorSchemeByName } from 'esri/smartMapping/symbology/support/colorRamps'
 import buildChart from './chart';
 import { PurpleairService } from '../services/purpleair.service';
+import Color from 'esri/Color';
+import { ColorScheme } from '../models/ColorScheme.model';
 
 @Component({
   selector: 'app-map',
@@ -49,6 +52,11 @@ export class MapComponent implements OnInit, OnDestroy {
   private _loaded = false;
   private _view: MapView = null;
   private layers: Array<any> = [];
+  private currentColorScheme: ColorScheme
+  private defaultColors = [Color.fromHex('#80E235'), Color.fromHex('#FFFF3C'), Color.fromHex('#E37D1C'), Color.fromHex('#DA0300'), Color.fromHex('#82004B'), Color.fromHex('#6B0027')]
+  private deutanColors = getColorSchemeByName('Purple 2').colorsForClassBreaks[5].colors;
+  private protanColors = getColorSchemeByName('Purple 4').colorsForClassBreaks[5].colors;
+  private tritanColors = getColorSchemeByName('Red 5').colorsForClassBreaks[5].colors;
   hypermapMenuItems: MenuItem[];
 
   get mapLoaded(): boolean {
@@ -91,6 +99,7 @@ export class MapComponent implements OnInit, OnDestroy {
   async initializeMap() {
 
     this.initializeWorkers();
+    console.log(getColorSchemeByName("Green 4").colorsForClassBreaks)
 
     const token = await this.tokenService.getToken().toPromise()
     IdentityManager.registerToken({
@@ -99,278 +108,366 @@ export class MapComponent implements OnInit, OnDestroy {
     })
 
     // Add each layer uploaded via admin UI to array of available layers
-    this.layerService.getLayers().subscribe(async layers => {
-      for (const layer of layers) {
-        if (layer.type === 'GeoJSON') {
-            const newLayer = new GeoJSONLayer({
-              url: `http://localhost:5431${layer.path}`,
-              title: layer.name,
-              visible: false
-            });
-            this.layers.push(newLayer);
-          } else {
-            const newLayer = await Layer.fromPortalItem({
-              portalItem: new PortalItem({
-                id: layer.arcgis
-              })
-            });
-            newLayer.visible = false;
-            this.layers.push(newLayer);
-          }
+    const layers = await this.layerService.getLayers().toPromise();
+    for (const layer of layers) {
+      if (layer.type === 'GeoJSON') {
+        const newLayer = new GeoJSONLayer({
+          url: `http://localhost:5431${layer.path}`,
+          title: layer.name,
+          visible: false
+        });
+        this.layers.push(newLayer);
+      } else {
+        const newLayer = await Layer.fromPortalItem({
+          portalItem: new PortalItem({
+            id: layer.arcgis
+          })
+        });
+        newLayer.visible = false;
+        this.layers.push(newLayer);
       }
+    }
 
-      const purpleAirLabels = new LabelClass({
-        labelPlacement: "center-center",
-        minScale: 2500000,
-        labelExpressionInfo: {
-          expression: "Round($feature.corrected_pm2_5, 2)"
-        }
-      });
+    const purpleAirLabels = new LabelClass({
+      labelPlacement: "center-center",
+      minScale: 2500000,
+      labelExpressionInfo: {
+        expression: "Round($feature.corrected_pm2_5, 2)"
+      }
+    });
 
-      const clusteredPurpleAirLabels = new LabelClass({
-        symbol: new TextSymbol({
-          color: 'white',
-          haloColor: "black",
-          haloSize: "1px",
-          font: new Font({
-            family: 'CalciteWebCoreIcons',
-            size: 12
-          })
-        }),
-        labelPlacement: 'center-center',
-        labelExpressionInfo: {
-          expression: '"\ue67a"' // esri-icon-zoom-in-magnifying-glass
-        }
-      })
-
-      const sensorRenderer = new SimpleRenderer({
-        symbol: new SimpleMarkerSymbol({
-          size: 30,
-          color: [0, 244, 255, 1]
-        }),
-        visualVariables: [
-          new ColorVariable({
-            field: "corrected_pm2_5",
-            stops: [
-              {
-                value: 0,
-                color: "#80E235",
-                label: 'Good'
-              },
-              {
-                value: 12.1,
-                color: "#FFFF3C",
-                label: 'Moderate'
-              },
-              {
-                value: 35.5,
-                color: "#E37D1C",
-                label: 'Unhealthy for sensitive groups'
-              },
-              {
-                value: 55.5,
-                color: "#DA0300",
-                label: 'Unhealthy'
-              },
-              {
-                value: 150.5,
-                color: "#82004B",
-                label: 'Very Unhealthy'
-              },
-              {
-                value: 250.5,
-                color: "#6B0027",
-                label: 'Hazardous'
-              }
-            ]
-          })
-        ]
-      });
-
-      const sensorPopupFields = new FieldsContent({
-        fieldInfos: [
-          new FieldInfo({
-            label: 'PM2.5 (Corrected)',
-            fieldName: 'corrected_pm2_5'
-          }),
-          new FieldInfo({
-            label: 'PM2.5',
-            fieldName: 'pm2_5'
-          }),
-          new FieldInfo({
-            label: 'Correction Method',
-            fieldName: 'correction_method'
-          }),
-          /* new FieldInfo({
-            label: 'Last Updated',
-            fieldName: 'expression/sensorLastUpdated',
-            format: new FieldInfoFormat({
-              dateFormat: 'day-short-month-year-short-time'
-            }),
-          }) */
-        ]
-      })
-
-      const graphContent = new CustomContent({
-        outFields: ['*'],
-        creator: (graphic) => buildChart(graphic, this.purpleAirService)
-      });
-
-      const sensorDetailTemplate = new PopupTemplate({
-        title: "{name}",
-        content: [sensorPopupFields, graphContent],
-        /* expressionInfos: [
-          new ExpressionInfo({
-            name: 'sensorLastUpdated',
-            title: 'Last Updated',
-            expression: '$feature.time / 1000'
-          })
-        ] */
-      });
-
-      // Create and push the layer for PurpleAir sensors
-      const purpleAirLayer = new GeoJSONLayer({
-        // Thanks Lambda, you served us well
-        // url: "https://k5emdaxun6.execute-api.us-east-1.amazonaws.com/dev/purpleair",
-        url: 'http://localhost:5431/api/purpleair/geojson',
-        title: 'PurpleAir Sensors',
-        copyright: 'PurpleAir',
-        popupTemplate: sensorDetailTemplate,
-        renderer: sensorRenderer,
-        labelingInfo: [purpleAirLabels],
-        featureReduction: new FeatureReductionCluster({
-          clusterRadius: 80,
-          clusterMinSize: 30,
-          clusterMaxSize: 30,
-          labelingInfo: [clusteredPurpleAirLabels]
-        }),
-        fields: [
-          new Field({
-            name: 'purpleair_id',
-            alias: 'Sensor ID',
-            type: 'integer'
-          }),
-          new Field({
-            name: 'name',
-            alias: 'Sensor Name',
-            type: 'string'
-          }),
-          new Field({
-            name: 'pm2_5',
-            alias: 'Particulate Matter in the Air (micrograms per cubic meter)',
-            type: 'double'
-          }),
-          new Field({
-            name: 'humidity',
-            alias: 'Relative Humidity',
-            type: 'integer'
-          }),
-          new Field({
-            name: 'temperature',
-            alias: 'Temperature',
-            type: 'integer'
-          }),
-          new Field({
-            name: 'corrected_pm2_5',
-            alias: 'Particulate Matter in the Air (µg/m³)',
-            type: 'double'
-          }),
-          new Field({
-            name: 'correction_method',
-            alias: 'Correction Method',
-            type: 'string'
-          })
-        ]
-      });
-      this.layers.push(purpleAirLayer);
-
-
-      // Configure the Map
-      const mapProperties = {
-        basemap: this._basemap,
-        layers: this.layers
-      };
-
-      const map = new Map(mapProperties);
-
-      // Initialize the MapView
-      const mapViewProperties = {
-        container: this.mapViewEl.nativeElement,
-        center: this._center,
-        zoom: this._zoom,
-        map: map
-      };
-
-
-      this._view = new MapView(mapViewProperties);
-
-      // wait for the map to load
-      await this._view.when();
-
-      // Add LayerList Widget
-      const layerList = new LayerList({
-        view: this._view,
-        selectionEnabled: true,
-        // executes for each ListItem in the LayerList
-        listItemCreatedFunction: function (event) {
-          // The event object contains properties of the
-          // layer in the LayerList widget.
-          var item = event.item;
-
-          if (item) {
-            // open the list item in the LayerList
-            item.open = true;
-            // set an action for zooming to the full extent of the layer
-            item.actionsSections = [[{
-              title: "Go to full extent",
-              className: "esri-icon-zoom-out-fixed",
-              id: "full-extent"
-            }]];
-          }
-        }
-      });
-
-      const legend = new Legend({
-        view: this._view
-      });
-
-      const basemapToggle = new BasemapToggle({
-        view: this._view,
-        nextBasemap: "hybrid"
-      });
-
-      // Add widgets to view
-      this._view.ui.add(layerList, 'top-right');
-      this._view.ui.add('mapMenuButton', 'bottom-right');
-      this._view.ui.add([legend, basemapToggle], 'bottom-left');
-
-
-      this._view.on('click', async (event) => {
-        const r = await this._view.hitTest(event.screenPoint);
-        r.results.forEach(result => {
-          if (result.graphic.attributes.clusterId) {
-            this._view.goTo({
-              target: result.graphic,
-              zoom: this._view.zoom + 2
-            })
-          }
+    const clusteredPurpleAirLabels = new LabelClass({
+      symbol: new TextSymbol({
+        color: 'white',
+        haloColor: "black",
+        haloSize: "1px",
+        font: new Font({
+          family: 'CalciteWebCoreIcons',
+          size: 12
         })
+      }),
+      labelPlacement: 'center-center',
+      labelExpressionInfo: {
+        expression: '"\ue67a"' // esri-icon-zoom-in-magnifying-glass
+      }
+    })
+
+    const sensorRenderer = new SimpleRenderer({
+      symbol: new SimpleMarkerSymbol({
+        size: 30,
+        color: [0, 244, 255, 1]
+      }),
+      visualVariables: [
+        new ColorVariable({
+          field: "corrected_pm2_5",
+          stops: [
+            {
+              value: 0,
+              color: "#80E235",
+              label: 'Good'
+            },
+            {
+              value: 12.1,
+              color: "#FFFF3C",
+              label: 'Moderate'
+            },
+            {
+              value: 35.5,
+              color: "#E37D1C",
+              label: 'Unhealthy for sensitive groups'
+            },
+            {
+              value: 55.5,
+              color: "#DA0300",
+              label: 'Unhealthy'
+            },
+            {
+              value: 150.5,
+              color: "#82004B",
+              label: 'Very Unhealthy'
+            },
+            {
+              value: 250.5,
+              color: "#6B0027",
+              label: 'Hazardous'
+            }
+          ]
+        })
+      ]
+    });
+
+    const purpleAirRenderer = new ClassBreaksRenderer({
+      field: 'corrected_pm2_5',
+      classBreakInfos: [
+        new ClassBreakInfo({
+          minValue: 0,
+          maxValue: 12,
+          label: 'Good (≤ 12 µg/m³)',
+          symbol: new SimpleMarkerSymbol({
+            size: 30,
+            color: this.defaultColors[0]
+          })
+        }),
+        new ClassBreakInfo({
+          minValue: 12.01,
+          maxValue: 35.4,
+          label: 'Moderate (≤ 35.4 µg/m³)',
+          symbol: new SimpleMarkerSymbol({
+            size: 30,
+            color: this.defaultColors[1]
+          })
+        }),
+        new ClassBreakInfo({
+          minValue: 35.5,
+          maxValue: 55.4,
+          label: 'Unhealthy for sensitive groups (≤ 55.4 µg/m³)',
+          symbol: new SimpleMarkerSymbol({
+            size: 30,
+            color: this.defaultColors[2]
+          })
+        }),
+        new ClassBreakInfo({
+          minValue: 55.5,
+          maxValue: 150.4,
+          label: 'Unhealthy (≤ 150.4 µg/m³)',
+          symbol: new SimpleMarkerSymbol({
+            size: 30,
+            color: this.defaultColors[3]
+          })
+        }),
+        new ClassBreakInfo({
+          minValue: 150.5,
+          maxValue: 250.4,
+          label: 'Very Unhealthy (≤ 250.4 µg/m³)',
+          symbol: new SimpleMarkerSymbol({
+            size: 30,
+            color: this.defaultColors[4]
+          })
+        }),
+        new ClassBreakInfo({
+          minValue: 250.5,
+          maxValue: 42000,
+          label: 'Hazardous (≥ 250.5 µg/m³)',
+          symbol: new SimpleMarkerSymbol({
+            size: 30,
+            color: this.defaultColors[5]
+          })
+        }),
+      ]
+    })
+
+    const sensorPopupFields = new FieldsContent({
+      fieldInfos: [
+        new FieldInfo({
+          label: 'PM2.5 (Corrected)',
+          fieldName: 'corrected_pm2_5'
+        }),
+        new FieldInfo({
+          label: 'PM2.5',
+          fieldName: 'pm2_5'
+        }),
+        new FieldInfo({
+          label: 'Correction Method',
+          fieldName: 'correction_method'
+        }),
+        /* new FieldInfo({
+          label: 'Last Updated',
+          fieldName: 'expression/sensorLastUpdated',
+          format: new FieldInfoFormat({
+            dateFormat: 'day-short-month-year-short-time'
+          }),
+        }) */
+      ]
+    })
+
+    const graphContent = new CustomContent({
+      outFields: ['*'],
+      creator: (graphic) => buildChart(graphic, this.purpleAirService)
+    });
+
+    const sensorDetailTemplate = new PopupTemplate({
+      title: "{name}",
+      content: [sensorPopupFields, graphContent],
+      /* expressionInfos: [
+        new ExpressionInfo({
+          name: 'sensorLastUpdated',
+          title: 'Last Updated',
+          expression: '$feature.time / 1000'
+        })
+      ] */
+    });
+
+    // Create and push the layer for PurpleAir sensors
+    const purpleAirLayer = new GeoJSONLayer({
+      // Thanks Lambda, you served us well
+      // url: "https://k5emdaxun6.execute-api.us-east-1.amazonaws.com/dev/purpleair",
+      url: 'http://localhost:5431/api/purpleair/geojson',
+      title: 'PurpleAir Sensors',
+      copyright: 'PurpleAir',
+      popupTemplate: sensorDetailTemplate,
+      renderer: purpleAirRenderer,
+      labelingInfo: [purpleAirLabels],
+      featureReduction: new FeatureReductionCluster({
+        clusterRadius: 80,
+        clusterMinSize: 30,
+        clusterMaxSize: 30,
+        labelingInfo: [clusteredPurpleAirLabels]
+      }),
+      fields: [
+        new Field({
+          name: 'purpleair_id',
+          alias: 'Sensor ID',
+          type: 'integer'
+        }),
+        new Field({
+          name: 'name',
+          alias: 'Sensor Name',
+          type: 'string'
+        }),
+        new Field({
+          name: 'pm2_5',
+          alias: 'Particulate Matter in the Air (micrograms per cubic meter)',
+          type: 'double'
+        }),
+        new Field({
+          name: 'humidity',
+          alias: 'Relative Humidity',
+          type: 'integer'
+        }),
+        new Field({
+          name: 'temperature',
+          alias: 'Temperature',
+          type: 'integer'
+        }),
+        new Field({
+          name: 'corrected_pm2_5',
+          alias: 'Particulate Matter in the Air (µg/m³)',
+          type: 'double'
+        }),
+        new Field({
+          name: 'correction_method',
+          alias: 'Correction Method',
+          type: 'string'
+        })
+      ]
+    });
+    this.layers.push(purpleAirLayer);
+
+
+    // Configure the Map
+    const mapProperties = {
+      basemap: this._basemap,
+      layers: this.layers
+    };
+
+    const map = new Map(mapProperties);
+
+    // Initialize the MapView
+    const mapViewProperties = {
+      container: this.mapViewEl.nativeElement,
+      center: this._center,
+      zoom: this._zoom,
+      map: map
+    };
+
+
+    this._view = new MapView(mapViewProperties);
+
+    // wait for the map to load
+    await this._view.when();
+
+    // Add LayerList Widget
+    const layerList = new LayerList({
+      view: this._view,
+      selectionEnabled: true,
+      // executes for each ListItem in the LayerList
+      listItemCreatedFunction: function (event) {
+        // The event object contains properties of the
+        // layer in the LayerList widget.
+        var item = event.item;
+
+        if (item) {
+          // open the list item in the LayerList
+          item.open = true;
+          // set an action for zooming to the full extent of the layer
+          item.actionsSections = [[{
+            title: "Go to full extent",
+            className: "esri-icon-zoom-out-fixed",
+            id: "full-extent"
+          }]];
+        }
+      }
+    });
+
+    const legend = new Legend({
+      view: this._view
+    });
+
+    const basemapToggle = new BasemapToggle({
+      view: this._view,
+      nextBasemap: "hybrid"
+    });
+
+    // Add widgets to view
+    this._view.ui.add(layerList, 'top-right');
+    this._view.ui.add('mapMenuButton', 'bottom-right');
+    this._view.ui.add(legend, 'bottom-left');
+    this._view.ui.add(basemapToggle, 'top-left');
+
+
+    this._view.on('click', async (event) => {
+      const r = await this._view.hitTest(event.screenPoint);
+      r.results.forEach(result => {
+        if (result.graphic.attributes.clusterId) {
+          this._view.goTo({
+            target: result.graphic,
+            zoom: this._view.zoom + 2
+          })
+        }
+      })
+    });
+
+    // Done loading the map
+    this.mapLoadedEvent.emit(true);
+
+    const setColorScheme = (colorScheme: ColorScheme) => {
+      let colors = this.defaultColors;
+      switch (colorScheme.type) {
+        case 'default':
+          colors = this.defaultColors;
+          break;
+        case 'deutan':
+          colors = this.deutanColors;
+          break;
+        case 'protan':
+          colors = this.protanColors;
+          break;
+        case 'tritan':
+          colors = this.tritanColors;
+          break;
+        default:
+          break;
+      }
+      const renderer = purpleAirRenderer.clone();
+      renderer.classBreakInfos.forEach((info, index) => {
+        info.symbol.color = colors[index];
       });
+      purpleAirLayer.renderer = renderer;
+    }
 
-      // Done loading the map
-      this.mapLoadedEvent.emit(true);
-
-      // Welcome Modal
-      this.welcomeService.show.subscribe(modalOpen => {
+    // Welcome Modal
+    this.welcomeService.show.subscribe(modalOpen => {
       if (modalOpen) {
         this._view.goTo({
           center: [-77.46576684324452, 37.56118644444622],
           zoom: 10
         });
         this._view.popup.close();
+        this.welcomeService.setColorScheme({ type: 'default', label: '' });
       }
     });
-    })
+
+    this.welcomeService.colorScheme.subscribe(setColorScheme);
   }
 
   initializeWorkers() {
