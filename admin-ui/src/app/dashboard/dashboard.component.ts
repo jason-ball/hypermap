@@ -99,7 +99,6 @@ export class DashboardComponent implements OnInit {
     }
 
     async saveLayer() {
-        debugger
         this.submitted = true;
 
         switch (this.selectedLayerType.code) {
