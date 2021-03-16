@@ -9,7 +9,9 @@
 
   <p-footer>
     <hr style="opacity: 20%;">
-    <button pButton type="button" id="colorblindButton" label="Colorblind?" icon="pi pi-eye" iconPos="left" class="p-button-outlined p-button-secondary p-text-bold" (click)="menu.toggle($event)"></button>
-    <p-menu #menu id="colorblindMenu" [popup]="true" [model]="colorblindItems" appendTo="body"></p-menu>
+    <div id="color-blind-toggle">
+      <label for="color-blind-dropdown">Color Scheme:</label>
+      <p-dropdown [options]="colorSchemes" [(ngModel)]="activeColorScheme" (onChange)=colorChange($event) optionLabel="label" id="color-blind-dropdown"></p-dropdown>
+    </div>
   </p-footer>
 </p-dialog>
