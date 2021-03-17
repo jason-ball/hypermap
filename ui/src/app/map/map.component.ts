@@ -5,16 +5,6 @@ import Map from "esri/Map";
 import MapView from "esri/views/MapView";
 import esriConfig from "esri/config";
 import GeoJSONLayer from 'esri/layers/GeoJSONLayer';
-import PopupTemplate from 'esri/PopupTemplate';
-import ClassBreaksRenderer from 'esri/renderers/ClassBreaksRenderer';
-import ClassBreakInfo from 'esri/renderers/support/ClassBreakInfo'
-import SimpleMarkerSymbol from 'esri/symbols/SimpleMarkerSymbol';
-import LabelClass from 'esri/layers/support/LabelClass';
-import FieldInfo from 'esri/popup/FieldInfo';
-import FieldsContent from 'esri/popup/content/FieldsContent';
-import FeatureReductionCluster from 'esri/layers/support/FeatureReductionCluster';
-import TextSymbol from 'esri/symbols/TextSymbol';
-import Font from 'esri/symbols/Font';
 import LayerList from 'esri/widgets/LayerList';
 import { WelcomeService } from '../services/welcome.service';
 import { LayerService } from '../services/layer.service';
@@ -22,16 +12,9 @@ import Layer from 'esri/layers/Layer';
 import PortalItem from 'esri/portal/PortalItem';
 import Legend from 'esri/widgets/Legend';
 import BasemapToggle from 'esri/widgets/BasemapToggle';
-import { DetailsModalComponent } from '../details-modal/details-modal.component';
-import Field from 'esri/layers/support/Field';
 import IdentityManager from 'esri/identity/IdentityManager';
 import { TokenService } from '../services/token.service';
-import CustomContent from 'esri/popup/content/CustomContent';
-import { byName as getColorSchemeByName } from 'esri/smartMapping/symbology/support/colorRamps'
-import buildChart from './chart';
 import { PurpleAirService } from '../services/purpleair.service';
-import Color from 'esri/Color';
-import { ColorScheme } from '../models/ColorScheme.model';
 import { PurpleAirLayer } from './PurpleAirLayer';
 
 @Component({
