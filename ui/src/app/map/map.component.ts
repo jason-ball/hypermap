@@ -6,7 +6,6 @@ import MapView from "esri/views/MapView";
 import esriConfig from "esri/config";
 import GeoJSONLayer from 'esri/layers/GeoJSONLayer';
 import PopupTemplate from 'esri/PopupTemplate';
-import SimpleRenderer from 'esri/renderers/SimpleRenderer';
 import ClassBreaksRenderer from 'esri/renderers/ClassBreaksRenderer';
 import ClassBreakInfo from 'esri/renderers/support/ClassBreakInfo'
 import SimpleMarkerSymbol from 'esri/symbols/SimpleMarkerSymbol';
@@ -61,6 +60,7 @@ export class MapComponent implements OnInit, OnDestroy {
   private tritanColors = getColorSchemeByName('Red and Gray 6').colorsForClassBreaks[5].colors.reverse();
   private activeColors: Color[];
   hypermapMenuItems: MenuItem[];
+  private updateTimer: number;
 
   get mapLoaded(): boolean {
     return this._loaded;
@@ -267,7 +267,7 @@ export class MapComponent implements OnInit, OnDestroy {
     });
 
     // Create and push the layer for PurpleAir sensors
-    const purpleAirLayer = new GeoJSONLayer({
+    let purpleAirLayerProperties = {
       // Thanks Lambda, you served us well
       // url: "https://k5emdaxun6.execute-api.us-east-1.amazonaws.com/dev/purpleair",
       url: 'http://localhost:5431/api/purpleair/geojson',
@@ -319,7 +319,8 @@ export class MapComponent implements OnInit, OnDestroy {
           type: 'string'
         })
       ]
-    });
+    };
+    let purpleAirLayer = new GeoJSONLayer(purpleAirLayerProperties);
     this.layers.push(purpleAirLayer);
 
 
@@ -344,6 +345,20 @@ export class MapComponent implements OnInit, OnDestroy {
 
       // wait for the map to load
       await this._view.when();
+
+      const updatePurpleAirLayer = () => {
+        console.log('[HYPERMAP] Updating PurpleAir data...');
+
+        map.layers.remove(purpleAirLayer);
+        this.layers = this.layers.filter(layer => layer != purpleAirLayer);
+        purpleAirLayer.destroy();
+
+        const newLayer = new GeoJSONLayer(purpleAirLayerProperties);
+
+        this.layers.push(newLayer);
+        map.layers.add(newLayer);
+        purpleAirLayer = newLayer;
+      }
 
       // Add LayerList Widget
       const layerList = new LayerList({
@@ -394,7 +409,7 @@ export class MapComponent implements OnInit, OnDestroy {
           // Determine layer selected by user and display details modal
           console.log(`showing layer information ${this.layerDescriptions}`);
           let layer = event.item.layer;
-          this.curDetails = this.layerDescriptions.find(x => x.uid == layer.get('uid'));      
+          this.curDetails = this.layerDescriptions.find(x => x.uid == layer.get('uid'));
           this.showDetails = true;
           break;
         }
@@ -482,6 +497,9 @@ export class MapComponent implements OnInit, OnDestroy {
         });
         this._view.popup.close();
         this.welcomeService.setColorScheme({ type: 'default', label: '' });
+        this.updateTimer = window.setInterval(updatePurpleAirLayer, 10000);
+      } else {
+        window.clearInterval(this.updateTimer);
       }
     });
 
