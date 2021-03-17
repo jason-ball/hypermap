@@ -120,16 +120,16 @@ export class MapComponent implements OnInit, OnDestroy {
             id: layer.arcgis
           })
         });
-        let portalItem:any = newLayer.get('portalItem');
-    	let portalItemDesc = portalItem.get('description');
-    	let portalAttrib = portalItem.get('accessInformation');
-    	let layerDesc = {
-      		"uid": newLayer.get('uid'),
-      		"name": layer.name,
-      		"description": layer.description == null ? portalItemDesc : layer.description,
-      		"attribution": portalAttrib
-    	}
-    	this.layerDescriptions.push(layerDesc)
+        let portalItem: any = newLayer.get('portalItem');
+        let portalItemDesc = portalItem.get('description');
+        let portalAttrib = portalItem.get('accessInformation');
+        let layerDesc = {
+          "uid": newLayer.get('uid'),
+          "name": layer.name,
+          "description": layer.description == null ? portalItemDesc : layer.description,
+          "attribution": portalAttrib
+        }
+        this.layerDescriptions.push(layerDesc)
         newLayer.visible = false;
         this.layers.push(newLayer);
       }
@@ -156,55 +156,55 @@ export class MapComponent implements OnInit, OnDestroy {
     };
 
 
-      this._view = new MapView(mapViewProperties);
+    this._view = new MapView(mapViewProperties);
 
-      // wait for the map to load
-      await this._view.when();
+    // wait for the map to load
+    await this._view.when();
 
-      // Add LayerList Widget
-      const layerList = new LayerList({
-        view: this._view,
-        selectionEnabled: true,
-        // executes for each ListItem in the LayerList
-        listItemCreatedFunction: function (event) {
-          // The event object contains properties of the
-          // layer in the LayerList widget.
-          var item = event.item;
+    // Add LayerList Widget
+    const layerList = new LayerList({
+      view: this._view,
+      selectionEnabled: true,
+      // executes for each ListItem in the LayerList
+      listItemCreatedFunction: function (event) {
+        // The event object contains properties of the
+        // layer in the LayerList widget.
+        var item = event.item;
 
-          if (item) {
-            // open the list item in the LayerList
-            item.open = true;
-            // set an action for zooming to the full extent of the layer
-            item.actionsSections = [      [
-              {
-                title: "Go to full extent",
-                className: "esri-icon-zoom-out-fixed",
-                id: "full-extent"
-              },
-              {
-                title: "Layer information",
-                className: "esri-icon-description",
-                id: "information"
-              }
-            ],
-            [
-              {
-                title: "Increase opacity",
-                className: "esri-icon-up",
-                id: "increase-opacity"
-              },
-              {
-                title: "Decrease opacity",
-                className: "esri-icon-down",
-                id: "decrease-opacity"
-              }
-            ]];
-          }
+        if (item) {
+          // open the list item in the LayerList
+          item.open = true;
+          // set an action for zooming to the full extent of the layer
+          item.actionsSections = [[
+            {
+              title: "Go to full extent",
+              className: "esri-icon-zoom-out-fixed",
+              id: "full-extent"
+            },
+            {
+              title: "Layer information",
+              className: "esri-icon-description",
+              id: "information"
+            }
+          ],
+          [
+            {
+              title: "Increase opacity",
+              className: "esri-icon-up",
+              id: "increase-opacity"
+            },
+            {
+              title: "Decrease opacity",
+              className: "esri-icon-down",
+              id: "decrease-opacity"
+            }
+          ]];
         }
-      });
+      }
+    });
     layerList.on("trigger-action", async (event) => {
       //Define custom layer list actions here
-      switch(event.action.id) {
+      switch (event.action.id) {
         case "information": {
           // Determine layer selected by user and display details modal
           let layer = event.item.layer;
@@ -222,7 +222,7 @@ export class MapComponent implements OnInit, OnDestroy {
         case "decrease-opacity": {
           let layer = event.item.layer;
           if (layer.opacity > 0)
-                layer.opacity -= 0.1;
+            layer.opacity -= 0.1;
 
           break;
         }
