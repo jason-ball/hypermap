@@ -31,11 +31,19 @@ export class PurpleAirLayer {
   private purpleAirLayerProperties = {}
   public geoJSONLayer: GeoJSONLayer;
 
+  /**
+   * Builds a new GeoJSONLayer with PurpleAir data
+   * @returns A new GeoJSONLayer
+   */
   public buildGeoJSONLayer(): GeoJSONLayer {
     this.geoJSONLayer = new GeoJSONLayer(this.purpleAirLayerProperties);
     return this.geoJSONLayer;
   }
 
+  /**
+   * Sets the PurpleAir layer to use the given color scheme
+   * @param colorScheme the color scheme to set the PurpleAir layer to
+   */
   public setColorScheme(colorScheme: ColorScheme) {
     let colors = this.defaultColors;
     switch (colorScheme.type) {
@@ -63,6 +71,10 @@ export class PurpleAirLayer {
     this.geoJSONLayer.renderer = renderer;
   }
 
+  /**
+   * Builds a new PurpleAir layer
+   * @param purpleAirService A PurpleAirService instance (needed for the charts)
+   */
   constructor(purpleAirService: PurpleAirService) {
     this.purpleAirService = purpleAirService;
 
