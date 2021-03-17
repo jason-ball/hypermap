@@ -5,14 +5,14 @@ import Color from 'esri/Color';
 import Graphic from 'esri/Graphic';
 import moment from 'moment';
 import { PurpleAirChartData } from '../models/PurpleAirChartData.model';
-import { PurpleairService } from '../services/purpleair.service';
+import { PurpleAirService } from '../services/purpleair.service';
 
 /**
  * Builds a chart from a PurpleAir point on the map
  * @param { Graphic } graphic PurpleAir point
  * @returns An HTML canvas with a graph
  */
-export default async function buildChart(g: any, purpleAirService: PurpleairService, colors: Color[]) {
+export default async function buildChart(g: any, purpleAirService: PurpleAirService, colors: Color[]) {
   const { graphic }: { graphic: Graphic } = g;
   const purpleAirID: number = graphic.attributes.purpleair_id ?? 0
   const div = document.createElement('div');

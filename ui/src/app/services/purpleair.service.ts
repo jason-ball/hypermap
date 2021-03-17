@@ -6,7 +6,7 @@ import { PurpleAirChartData } from '../models/PurpleAirChartData.model';
 @Injectable({
   providedIn: 'root'
 })
-export class PurpleairService {
+export class PurpleAirService {
 
   constructor(private httpClient: HttpClient) { }
 
