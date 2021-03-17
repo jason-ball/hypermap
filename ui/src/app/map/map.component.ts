@@ -84,9 +84,11 @@ export class MapComponent implements OnInit, OnDestroy {
 
     this.map.layers.remove(this.purpleAirGeoJSONLayer);
     this.layers = this.layers.filter(layer => layer != this.purpleAirGeoJSONLayer);
+    this.layerDescriptions = this.layerDescriptions.filter(desc => desc.uid != this.purpleAirGeoJSONLayer.get('uid'));
     this.purpleAirGeoJSONLayer.destroy();
 
     this.purpleAirGeoJSONLayer = this.purpleAirLayer.buildGeoJSONLayer();
+    this.layerDescriptions.push(this.purpleAirLayer.getDescription());
 
     this.layers.push(this.purpleAirGeoJSONLayer);
     this.map.layers.add(this.purpleAirGeoJSONLayer);
@@ -137,6 +139,7 @@ export class MapComponent implements OnInit, OnDestroy {
 
     this.purpleAirGeoJSONLayer = this.purpleAirLayer.buildGeoJSONLayer();
     this.layers.push(this.purpleAirGeoJSONLayer);
+    this.layerDescriptions.push(this.purpleAirLayer.getDescription());
 
 
     // Configure the Map

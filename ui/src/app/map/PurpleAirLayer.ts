@@ -37,6 +37,7 @@ export class PurpleAirLayer {
    */
   public buildGeoJSONLayer(): GeoJSONLayer {
     this.geoJSONLayer = new GeoJSONLayer(this.purpleAirLayerProperties);
+    console.log(this.geoJSONLayer.get('uid'))
     return this.geoJSONLayer;
   }
 
@@ -69,6 +70,19 @@ export class PurpleAirLayer {
     });
     this.purpleAirRenderer = renderer;
     this.geoJSONLayer.renderer = renderer;
+  }
+
+  /**
+   * Builds a description for the LayerList widget
+   * @returns Description for the LayerList widget
+   */
+  public getDescription() {
+    return {
+      uid: this.geoJSONLayer.get('uid'),
+      name: this.geoJSONLayer.title,
+      description: 'Air quality data from PurpleAir. Sensor data is corrected using equations from the EPA.',
+      attribution: 'PurpleAir'
+    }
   }
 
   /**
