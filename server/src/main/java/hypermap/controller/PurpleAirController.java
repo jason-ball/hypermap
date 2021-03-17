@@ -65,13 +65,12 @@ public class PurpleAirController {
             Map<String, Object> properties = new HashMap<>();
             f.setGeometry(p);
             properties.put("purpleair_id", sensor.getPurpleAirID());
-            // properties.put("time", sensor.getTime().getTime());
+            properties.put("time", sensor.getTime().getTime() / 1000);
             properties.put("pm2_5", sensor.getPm25());
             properties.put("temperature", sensor.getTemperature());
             properties.put("humidity", sensor.getHumidity());
             properties.put("corrected_pm2_5", sensor.getCorrectedPM25());
             properties.put("correction_method", sensor.getCorrectionMethod());
-            properties.put("test", new int[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10});
             f.setProperties(properties);
             features.add(f);
         }

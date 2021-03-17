@@ -45,3 +45,29 @@ canvas:focus {
 #color-blind-toggle label {
   padding-right: 4px;
 }
+
+.text-center {
+  text-align: center;
+}
+
+.sensor-row {
+  display: flex;
+  justify-content: space-around;
+}
+
+.sensor-row div p:first-child {
+  font-weight: bold;
+  font-size: large;
+}
+
+.esri-feature__content-element {
+  padding-bottom: 12px !important;
+}
+
+.esri-popup__footer {
+  display: none !important;
+}
+
+.esri-feature-content p {
+  margin-bottom: 0.75em !important;
+}

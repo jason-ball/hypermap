@@ -135,7 +135,7 @@ export default async function buildChart(g: any, purpleAirService: PurpleAirServ
 
   const range = document.createElement('label');
   range.setAttribute('for', `purpleair-chart-${graphic.attributes.purpleair_id}-mode-select`);
-  range.textContent = 'Range:';
+  range.textContent = 'Chart Range:';
   range.style.paddingRight = '2px';
 
   div.id = `purpleair-chart-${graphic.attributes.purpleair_id}`;

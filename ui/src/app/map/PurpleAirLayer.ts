@@ -4,7 +4,7 @@ import GeoJSONLayer from 'esri/layers/GeoJSONLayer';
 import FeatureReductionCluster from 'esri/layers/support/FeatureReductionCluster';
 import Field from 'esri/layers/support/Field';
 import LabelClass from 'esri/layers/support/LabelClass';
-import { FieldsContent, CustomContent } from 'esri/popup/content';
+import { FieldsContent, CustomContent, TextContent } from 'esri/popup/content';
 import FieldInfo from 'esri/popup/FieldInfo';
 import PopupTemplate from 'esri/PopupTemplate';
 import { ClassBreaksRenderer } from 'esri/rasterRenderers';
@@ -13,6 +13,10 @@ import { TextSymbol, Font, SimpleMarkerSymbol } from 'esri/symbols';
 import buildChart from './chart';
 import { PurpleAirService } from '../services/purpleair.service';
 import { ColorScheme } from '../models/ColorScheme.model';
+import Locator from 'esri/tasks/Locator';
+import Graphic from 'esri/Graphic';
+import { Point } from 'esri/geometry';
+import moment from 'moment';
 
 export class PurpleAirLayer {
 
@@ -27,9 +31,13 @@ export class PurpleAirLayer {
   private purpleAirRenderer: ClassBreaksRenderer;
   private sensorPopupFields: FieldsContent;
   private graphContent: CustomContent;
+  private addressContent: CustomContent;
+  private footerContent: CustomContent;
+  private sensorContent: CustomContent;
   private sensorDetailTemplate: PopupTemplate;
   private purpleAirLayerProperties = {}
   public geoJSONLayer: GeoJSONLayer;
+  private locator: Locator;
 
   /**
    * Builds a new GeoJSONLayer with PurpleAir data
@@ -91,6 +99,9 @@ export class PurpleAirLayer {
    */
   constructor(purpleAirService: PurpleAirService) {
     this.purpleAirService = purpleAirService;
+    this.locator = new Locator({
+      url: 'https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer',
+    });
 
     this.defaultColors = [Color.fromHex('#80E235'), Color.fromHex('#FFFF3C'), Color.fromHex('#E37D1C'), Color.fromHex('#DA0300'), Color.fromHex('#82004B'), Color.fromHex('#6B0027')]
     this.deutanColors = getColorSchemeByName('Red and Gray 4').colorsForClassBreaks[5].colors.reverse();
@@ -211,9 +222,74 @@ export class PurpleAirLayer {
       creator: (graphic) => buildChart(graphic, this.purpleAirService, this.activeColors)
     });
 
+    this.addressContent = new CustomContent({
+      outFields: ['*'],
+      creator: async (g: any) => {
+        const { graphic }: { graphic: Graphic } = g;
+        const point = graphic.geometry as Point;
+        const result = await this.locator.locationToAddress({
+          location: point,
+          locationType: 'street'
+        });
+        if (result.attributes.Addr_type === 'PointAddress') {
+          return `
+            <h1 class="text-center">${result.attributes.ShortLabel}</h1>
+            <h2 class="text-center">${result.address.split(/,\s(.+)/)[1]}</h2>
+          `;
+        } else {
+          return `<h1 class="text-center"">${result.attributes.ShortLabel}</h1>`;
+        }
+      }
+    });
+
+    this.footerContent = new CustomContent({
+      outFields: ['*'],
+      creator(g: any) {
+        const { graphic }: { graphic: Graphic } = g;
+        return `
+          <p class="text-center">Updated ${moment(graphic.attributes.time * 1000).fromNow()}.</p>
+          <p class="text-center">This data was corrected using equations from the EPA.</p>
+        `;
+      }
+    });
+
+    this.sensorContent = new CustomContent({
+      outFields: ['*'],
+      creator(g: any) {
+        const { graphic }: { graphic: Graphic } = g;
+        if (graphic.attributes.temperature && graphic.attributes.humidity) {
+          return `
+            <div class="sensor-row">
+              <div>
+                <p class="text-center">${graphic.attributes.corrected_pm2_5} µg/m³</p>
+                <p class="text-center">Particulate Matter</p>
+              </div>
+              <div>
+                <p class="text-center">${graphic.attributes.temperature} ˚F</p>
+                <p class="text-center">Temperature</p>
+              </div>
+              <div>
+                <p class="text-center">${graphic.attributes.humidity}%</p>
+                <p class="text-center">Relative Humidity</p>
+              </div>
+            </div>
+          `;
+        } else {
+          return `
+            <div class="sensor-row">
+              <div>
+                <p class="text-center">${graphic.attributes.corrected_pm2_5}</p>
+                <p class="text-center">Particulate Matter</p>
+              </div>
+            </div>
+          `;
+        }
+      }
+    });
+
     this.sensorDetailTemplate = new PopupTemplate({
       title: '{name}',
-      content: [this.sensorPopupFields, this.graphContent],
+      content: [this.addressContent, this.sensorContent, this.graphContent, this.footerContent],
       /* expressionInfos: [
         new ExpressionInfo({
           name: 'sensorLastUpdated',
@@ -273,6 +349,11 @@ export class PurpleAirLayer {
           name: 'correction_method',
           alias: 'Correction Method',
           type: 'string'
+        }),
+        new Field({
+          name: 'time',
+          alias: 'Last Updated',
+          type: 'integer'
         })
       ]
     };
