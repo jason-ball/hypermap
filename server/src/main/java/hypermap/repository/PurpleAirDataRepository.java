@@ -15,11 +15,14 @@ public interface PurpleAirDataRepository extends JpaRepository<PurpleAirData, Pu
 
     List<PurpleAirAverage> getByPurpleAirID(int id);
 
-    @Query(value = "SELECT purpleair_id, date_trunc('day', purpleair_history.time) AS time, ROUND(AVG(corrected_pm2_5), 2) as corrected_pm2_5\n" +
+    @Query(value = "SELECT *\n" +
+            "FROM (SELECT purpleair_id, date_trunc('day', purpleair_history.time) AS time, ROUND(AVG(corrected_pm2_5), 2) as corrected_pm2_5\n" +
             "FROM purpleair_history\n" +
             "WHERE purpleair_id = :id\n" +
             "GROUP BY date_trunc('day', purpleair_history.time), purpleair_id\n" +
-            "ORDER BY time", nativeQuery = true)
+            "ORDER BY time DESC\n" +
+            "LIMIT 7) a\n" +
+            "ORDER BY TIME ASC", nativeQuery = true)
     List<Object[]> getDailyDataByID(@Param("id") int id);
 
     @Query(value = "SELECT *\n" +
