@@ -1,9 +1,9 @@
 import { Component, OnInit, OnDestroy, ViewChild, ElementRef, Input, Output, EventEmitter, NgZone } from '@angular/core';
 import { MenuItem, PrimeIcons } from 'primeng/api';
 
-import Map from "esri/Map";
-import MapView from "esri/views/MapView";
-import esriConfig from "esri/config";
+import Map from 'esri/Map';
+import MapView from 'esri/views/MapView';
+import esriConfig from 'esri/config';
 import GeoJSONLayer from 'esri/layers/GeoJSONLayer';
 import LayerList from 'esri/widgets/LayerList';
 import { WelcomeService } from '../services/welcome.service';
@@ -124,10 +124,10 @@ export class MapComponent implements OnInit, OnDestroy {
         let portalItemDesc = portalItem.get('description');
         let portalAttrib = portalItem.get('accessInformation');
         let layerDesc = {
-          "uid": newLayer.get('uid'),
-          "name": layer.name,
-          "description": layer.description == null ? portalItemDesc : layer.description,
-          "attribution": portalAttrib
+          'uid': newLayer.get('uid'),
+          'name': layer.name,
+          'description': layer.description == null ? portalItemDesc : layer.description,
+          'attribution': portalAttrib
         }
         this.layerDescriptions.push(layerDesc)
         newLayer.visible = false;
@@ -169,57 +169,59 @@ export class MapComponent implements OnInit, OnDestroy {
       listItemCreatedFunction: function (event) {
         // The event object contains properties of the
         // layer in the LayerList widget.
-        var item = event.item;
+        const item = event.item;
 
         if (item) {
           // open the list item in the LayerList
           item.open = true;
           // set an action for zooming to the full extent of the layer
-          item.actionsSections = [[
-            {
-              title: "Go to full extent",
-              className: "esri-icon-zoom-out-fixed",
-              id: "full-extent"
-            },
-            {
-              title: "Layer information",
-              className: "esri-icon-description",
-              id: "information"
-            }
-          ],
-          [
-            {
-              title: "Increase opacity",
-              className: "esri-icon-up",
-              id: "increase-opacity"
-            },
-            {
-              title: "Decrease opacity",
-              className: "esri-icon-down",
-              id: "decrease-opacity"
-            }
-          ]];
+          item.actionsSections = [
+            [
+              {
+                title: 'Go to full extent',
+                className: 'esri-icon-zoom-out-fixed',
+                id: 'full-extent'
+              },
+              {
+                title: 'Layer information',
+                className: 'esri-icon-description',
+                id: 'information'
+              }
+            ],
+            [
+              {
+                title: 'Increase opacity',
+                className: 'esri-icon-up',
+                id: 'increase-opacity'
+              },
+              {
+                title: 'Decrease opacity',
+                className: 'esri-icon-down',
+                id: 'decrease-opacity'
+              }
+            ]
+          ];
         }
       }
     });
-    layerList.on("trigger-action", async (event) => {
+    layerList.on('trigger-action', async (event) => {
       //Define custom layer list actions here
       switch (event.action.id) {
-        case "information": {
+        case 'information': {
           // Determine layer selected by user and display details modal
           let layer = event.item.layer;
           this.curDetails = this.layerDescriptions.find(x => x.uid == layer.get('uid'));
           this.showDetails = true;
           break;
         }
-        case "increase-opacity": {
+        case 'increase-opacity': {
           let layer = event.item.layer;
           if (layer.opacity < 1)
             layer.opacity += 0.1;
 
           break;
         }
-        case "decrease-opacity": {
+        case 'decrease-opacity': {
           let layer = event.item.layer;
           if (layer.opacity > 0)
             layer.opacity -= 0.1;
@@ -235,7 +237,7 @@ export class MapComponent implements OnInit, OnDestroy {
 
     const basemapToggle = new BasemapToggle({
       view: this._view,
-      nextBasemap: "hybrid"
+      nextBasemap: 'hybrid'
     });
 
     // Add widgets to view
@@ -280,45 +282,45 @@ export class MapComponent implements OnInit, OnDestroy {
   }
 
   initializeWorkers() {
-    const DEFAULT_WORKER_URL = "https://js.arcgis.com/4.17/";
+    const DEFAULT_WORKER_URL = 'https://js.arcgis.com/4.17/';
     const DEFAULT_LOADER_URL = `${DEFAULT_WORKER_URL}dojo/dojo-lite.js`;
 
     esriConfig.workers.loaderUrl = DEFAULT_LOADER_URL;
     esriConfig.workers.loaderConfig = {
       baseUrl: `${DEFAULT_WORKER_URL}dojo`,
       packages: [
-        { name: "esri", location: `${DEFAULT_WORKER_URL}esri` },
-        { name: "dojo", location: `${DEFAULT_WORKER_URL}dojo` },
-        { name: "dojox", location: `${DEFAULT_WORKER_URL}dojox` },
-        { name: "dstore", location: `${DEFAULT_WORKER_URL}dstore` },
-        { name: "moment", location: `${DEFAULT_WORKER_URL}moment` },
-        { name: "@dojo", location: `${DEFAULT_WORKER_URL}@dojo` },
+        { name: 'esri', location: `${DEFAULT_WORKER_URL}esri` },
+        { name: 'dojo', location: `${DEFAULT_WORKER_URL}dojo` },
+        { name: 'dojox', location: `${DEFAULT_WORKER_URL}dojox` },
+        { name: 'dstore', location: `${DEFAULT_WORKER_URL}dstore` },
+        { name: 'moment', location: `${DEFAULT_WORKER_URL}moment` },
+        { name: '@dojo', location: `${DEFAULT_WORKER_URL}@dojo` },
         {
-          name: "cldrjs",
+          name: 'cldrjs',
           location: `${DEFAULT_WORKER_URL}cldrjs`,
-          main: "dist/cldr"
+          main: 'dist/cldr'
         },
         {
-          name: "globalize",
+          name: 'globalize',
           location: `${DEFAULT_WORKER_URL}globalize`,
-          main: "dist/globalize"
+          main: 'dist/globalize'
         },
         {
-          name: "maquette",
+          name: 'maquette',
           location: `${DEFAULT_WORKER_URL}maquette`,
-          main: "dist/maquette.umd"
+          main: 'dist/maquette.umd'
         },
         {
-          name: "maquette-css-transitions",
+          name: 'maquette-css-transitions',
           location: `${DEFAULT_WORKER_URL}maquette-css-transitions`,
-          main: "dist/maquette-css-transitions.umd"
+          main: 'dist/maquette-css-transitions.umd'
         },
         {
-          name: "maquette-jsx",
+          name: 'maquette-jsx',
           location: `${DEFAULT_WORKER_URL}maquette-jsx`,
-          main: "dist/maquette-jsx.umd"
+          main: 'dist/maquette-jsx.umd'
         },
-        { name: "tslib", location: `${DEFAULT_WORKER_URL}tslib`, main: "tslib" }
+        { name: 'tslib', location: `${DEFAULT_WORKER_URL}tslib`, main: 'tslib' }
       ]
     };
   }
