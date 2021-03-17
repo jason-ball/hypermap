@@ -275,7 +275,7 @@ export class MapComponent implements OnInit, OnDestroy {
         });
         this._view.popup.close();
         this.welcomeService.setColorScheme({ type: 'default', label: '' });
-        this.updateTimer = window.setInterval(() => this.updatePurpleAirLayer(), 10000);
+        this.updateTimer = window.setInterval(() => this.updatePurpleAirLayer(), 60000);
       } else {
         window.clearInterval(this.updateTimer);
       }
