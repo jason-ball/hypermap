@@ -263,6 +263,16 @@ export class MapComponent implements OnInit, OnDestroy {
       })
     });
 
+    // Use an event listener to manually open popups. 
+    // Avoids automatically opening empty popups after clicking on a geometry. 
+    this._view.popup.autoOpenEnabled = false;
+    this._view.on("click", async (event) => {
+      this._view.popup.open({
+        location: event.mapPoint,
+        fetchFeatures: true
+      });
+    });
+
     // Done loading the map
     this.mapLoadedEvent.emit(true);
 
