@@ -16,6 +16,8 @@ import IdentityManager from 'esri/identity/IdentityManager';
 import { TokenService } from '../services/token.service';
 import { PurpleAirService } from '../services/purpleair.service';
 import { PurpleAirLayer } from './PurpleAirLayer';
+import { Point } from 'esri/geometry';
+import { WebMercator } from 'esri/geometry/SpatialReference';
 
 @Component({
   selector: 'app-map',
@@ -250,27 +252,42 @@ export class MapComponent implements OnInit, OnDestroy {
     this._view.ui.add('detailsModal', 'center');
     this._view.ui.add(basemapToggle, 'top-left');
 
-
-    this._view.on('click', async (event) => {
+    // Use an event listener to manually open popups.
+    // Avoids automatically opening empty popups after clicking on a geometry.
+    this._view.popup.autoOpenEnabled = false;
+    this._view.popup.autoCloseEnabled = false;
+    this._view.on("click", async (event) => {
       const r = await this._view.hitTest(event.screenPoint);
-      r.results.forEach(result => {
+      for (const result of r.results) {
         if (result.graphic.attributes.clusterId) {
           this._view.goTo({
             target: result.graphic,
             zoom: this._view.zoom + 2
           })
+          break;
+        } else if (result.graphic.attributes.OBJECTID) {
+          const mapY = this._view.extent.ymin;
+          const pointY: number = result.graphic.geometry.get('y');
+          const pointX: number = result.graphic.geometry.get('x');
+          const deltaY = pointY - mapY - 5;
+          const p = new Point({
+            x: pointX,
+            y: this._view.center.y + deltaY,
+            spatialReference: WebMercator
+          });
+          this._view.goTo({
+            target: window.innerHeight < 978 ? p : this._view.center
+          })
+          .then(() => this._view.popup.open({
+            location: event.mapPoint,
+            fetchFeatures: true
+          }))
+          .catch(console.error)
+          break;
+        } else {
+            // this._view.popup.close();
         }
-      })
-    });
-
-    // Use an event listener to manually open popups. 
-    // Avoids automatically opening empty popups after clicking on a geometry. 
-    this._view.popup.autoOpenEnabled = false;
-    this._view.on("click", async (event) => {
-      this._view.popup.open({
-        location: event.mapPoint,
-        fetchFeatures: true
-      });
+      }
     });
 
     // Done loading the map
@@ -281,7 +298,8 @@ export class MapComponent implements OnInit, OnDestroy {
       if (modalOpen) {
         this._view.goTo({
           center: [-77.46576684324452, 37.56118644444622],
-          zoom: 10
+          zoom: 10,
+          rotation: 0,
         });
         this._view.popup.close();
         this.welcomeService.setColorScheme({ type: 'default', label: '' });
