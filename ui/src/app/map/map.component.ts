@@ -259,6 +259,7 @@ export class MapComponent implements OnInit, OnDestroy {
     this._view.on("click", async (event) => {
       const r = await this._view.hitTest(event.screenPoint);
       for (const result of r.results) {
+        // Runs when a clustered point is clicked
         if (result.graphic.attributes.clusterId) {
           this._view.goTo({
             target: result.graphic,
@@ -266,26 +267,29 @@ export class MapComponent implements OnInit, OnDestroy {
           })
           break;
         } else if (result.graphic.attributes.OBJECTID) {
+          // Runs if a layer is clicked
           const mapY = this._view.extent.ymin;
           const pointY: number = result.graphic.geometry.get('y');
           const pointX: number = result.graphic.geometry.get('x');
           const deltaY = pointY - mapY - 5;
+
           const p = new Point({
             x: pointX,
             y: this._view.center.y + deltaY,
             spatialReference: WebMercator
           });
+
           this._view.goTo({
             target: window.innerHeight < 978 ? p : this._view.center
           })
-          .then(() => this._view.popup.open({
-            location: event.mapPoint,
-            fetchFeatures: true
-          }))
-          .catch(console.error)
+            .then(() => this._view.popup.open({
+              location: event.mapPoint,
+              fetchFeatures: true
+            }))
+            .catch(console.error)
           break;
         } else {
-            // this._view.popup.close();
+          // this._view.popup.close();
         }
       }
     });
