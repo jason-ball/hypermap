@@ -233,8 +233,8 @@ export class PurpleAirLayer {
         });
         if (result.attributes.Addr_type === 'PointAddress') {
           return `
-            <h1 class="text-center">${result.attributes.ShortLabel}</h1>
-            <h2 class="text-center">${result.address.split(/,\s(.+)/)[1]}</h2>
+            <h1 class="text-center mt-0">${result.attributes.ShortLabel}</h1>
+            <h2 class="text-center mt-0">${result.address.split(/,\s(.+)/)[1]}</h2>
           `;
         } else {
           return `<h1 class="text-center"">${result.attributes.ShortLabel}</h1>`;
@@ -244,11 +244,9 @@ export class PurpleAirLayer {
 
     this.footerContent = new CustomContent({
       outFields: ['*'],
-      creator(g: any) {
-        const { graphic }: { graphic: Graphic } = g;
+      creator() {
         return `
-          <p class="text-center">Updated ${moment(graphic.attributes.time * 1000).fromNow()}.</p>
-          <p class="text-center">This data was corrected using equations from the EPA.</p>
+          <p class="text-center mb-0">This data was corrected using equations from the EPA.</p>
         `;
       }
     });

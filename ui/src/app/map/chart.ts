@@ -108,6 +108,11 @@ export default async function buildChart(g: any, purpleAirService: PurpleAirServ
   const select = document.createElement('select');
   select.id = `purpleair-chart-${graphic.attributes.purpleair_id}-mode-select`;
 
+  const lastUpdated = document.createElement('p');
+  lastUpdated.id = `purpleair-chart-${graphic.attributes.purpleair_id}-last-updated`;
+  lastUpdated.textContent = `Updated ${moment(graphic.attributes.time * 1000).fromNow()}`;
+  lastUpdated.classList.add('chart-last-updated');
+
   const oneHour = document.createElement('option');
   oneHour.value = '1h';
   oneHour.text = 'Last Hour';
@@ -131,7 +136,7 @@ export default async function buildChart(g: any, purpleAirService: PurpleAirServ
 
   const rangeDiv = document.createElement('div');
   rangeDiv.style.display = 'flex';
-  rangeDiv.style.justifyContent = 'flex-end';
+  rangeDiv.style.justifyContent = 'space-between';
 
   const range = document.createElement('label');
   range.setAttribute('for', `purpleair-chart-${graphic.attributes.purpleair_id}-mode-select`);
@@ -176,8 +181,11 @@ export default async function buildChart(g: any, purpleAirService: PurpleAirServ
     }
   });
 
-  rangeDiv.appendChild(range);
-  rangeDiv.appendChild(select);
+  rangeDiv.appendChild(lastUpdated);
+  const rangeSelect = document.createElement('div');
+  rangeSelect.appendChild(range);
+  rangeSelect.appendChild(select);
+  rangeDiv.appendChild(rangeSelect);
   div.appendChild(rangeDiv);
   div.appendChild(canvas);
 
