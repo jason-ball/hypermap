@@ -268,7 +268,6 @@ export class MapComponent implements OnInit, OnDestroy {
           break;
         } else if (result.graphic.attributes.corrected_pm2_5) {
           // Runs if a PurpleAir sensor is clicked
-          console.log(result.graphic)
           const mapY = this._view.extent.ymin;
           const pointY: number = result.graphic.geometry.get('y');
           const pointX: number = result.graphic.geometry.get('x');
