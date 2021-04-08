@@ -266,8 +266,9 @@ export class MapComponent implements OnInit, OnDestroy {
             zoom: this._view.zoom + 2
           })
           break;
-        } else if (result.graphic.attributes.OBJECTID) {
-          // Runs if a layer is clicked
+        } else if (result.graphic.attributes.corrected_pm2_5) {
+          // Runs if a PurpleAir sensor is clicked
+          console.log(result.graphic)
           const mapY = this._view.extent.ymin;
           const pointY: number = result.graphic.geometry.get('y');
           const pointX: number = result.graphic.geometry.get('x');
@@ -288,8 +289,11 @@ export class MapComponent implements OnInit, OnDestroy {
             }))
             .catch(console.error)
           break;
-        } else {
-          // this._view.popup.close();
+        } else if (result.graphic.attributes.OBJECTID) {
+          this._view.popup.open({
+            location: event.mapPoint,
+            fetchFeatures: true
+          });
         }
       }
     });
