@@ -1,6 +1,6 @@
 package hypermap.entity;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -14,9 +14,11 @@ import java.util.Date;
 @Getter
 @NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class PurpleAirData {
     @Id
     @Column(name = "purpleair_id")
+    @JsonProperty("sensor_index")
     private int purpleAirID;
 
     @Id
@@ -44,4 +46,61 @@ public class PurpleAirData {
     @Column(name = "longitude")
     private double longitude;
 
+    @JsonSetter("sensor_index")
+    public void setPurpleAirID(int purpleAirID) {
+        this.purpleAirID = purpleAirID;
+    }
+
+    @JsonSetter("last_seen")
+    public void setTime(Date time) {
+        this.time = time;
+    }
+
+    @JsonSetter("pm2.5")
+    public void setPm25(double pm25) {
+        this.pm25 = pm25;
+    }
+
+    @JsonSetter("temperature")
+    public void setTemperature(Integer temperature) {
+        this.temperature = temperature;
+    }
+
+    @JsonSetter("humidity")
+    public void setHumidity(Integer humidity) {
+        this.humidity = humidity;
+    }
+
+    @JsonSetter("latitude")
+    public void setLatitude(double latitude) {
+        this.latitude = latitude;
+    }
+
+    @JsonSetter("longitude")
+    public void setLongitude(double longitude) {
+        this.longitude = longitude;
+    }
+
+    public void setCorrectedPM25(Double correctedPM25) {
+        this.correctedPM25 = correctedPM25;
+    }
+
+    public void setCorrectionMethod(String correctionMethod) {
+        this.correctionMethod = correctionMethod;
+    }
+
+    @Override
+    public String toString() {
+        return "PurpleAirData{" +
+                "purpleAirID=" + purpleAirID +
+                ", time=" + time +
+                ", pm25=" + pm25 +
+                ", temperature=" + temperature +
+                ", humidity=" + humidity +
+                ", correctedPM25=" + correctedPM25 +
+                ", correctionMethod='" + correctionMethod + '\'' +
+                ", latitude=" + latitude +
+                ", longitude=" + longitude +
+                '}';
+    }
 }
