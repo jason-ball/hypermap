@@ -1,0 +1,54 @@
+#
+# Hypermap Docker Compose File
+# Jason Ball | Evan Scott | Naomi Steele | Christian Manu
+#
+
+version: "3.0"
+services:
+  # This service can be removed if another database service is used (e.g., AWS RDS)
+  hypermap_db:
+    image: postgres
+    restart: always
+    environment:
+      # DB user. This should not be changed.
+      POSTGRES_USER: postgres
+      # DB password. THIS SHOULD BE CHANGED!
+      POSTGRES_PASSWORD: db_password
+    networks:
+      - hypermap
+    volumes:
+      - type: bind
+        source: ./db.sql
+        target: /docker-entrypoint-initdb.d/init.sql
+      - type: volume
+        source: dbdata
+        target: /var/lib/postgresql/data
+    # Uncomment this to allow external connections
+    ports:
+      - "5432:5432"
+      - "8080:8080"
+
+  hypermap_server:
+    build: ./server
+    image: hypermap/server
+    ports:
+      - "5431:5431"
+      - "8081:8080"
+    environment:
+      HYPERMAP_DB_HOST: hypermap_db
+      HYPERMAP_DB_PORT: 5432
+      HYPERMAP_DB: hypermap
+      HYPERMAP_DB_USERNAME: postgres
+      HYPERMAP_DB_PASSWORD: db_password
+      HYPERMAP_SERVER_API_KEY: api_key
+      HYPERMAP_SERVER_AUTOUPDATE: "true"
+    networks:
+      - hypermap
+    depends_on:
+      - hypermap_db
+
+volumes:
+  dbdata:
+
+networks:
+  hypermap:
