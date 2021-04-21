@@ -1,5 +1,23 @@
-{"properties": [{
-  "name": "spring.jpa.properties.hibernate.dialect",
-  "type": "java.lang.String",
-  "description": "A description for 'spring.jpa.properties.hibernate.dialect'"
-}]}
+{
+  "properties": [
+    {
+      "name": "spring.jpa.properties.hibernate.dialect",
+      "type": "java.lang.String",
+      "description": "A description for 'spring.jpa.properties.hibernate.dialect'"
+    },
+    {
+      "name": "hypermap.security.auth-header",
+      "type": "java.lang.String",
+      "description": "HTTP Header to extract auth token from."
+    },
+    {
+      "name": "hypermap.purpleair.autoupdate",
+      "type": "java.lang.Boolean",
+      "description": "Enables periodic PurpleAir updates. This should be set to false if the AWS Lambda function is used."
+    },
+    {
+      "name": "hypermap.security.apiKey",
+      "type": "java.lang.String",
+      "description": "API Key for non-GET requests."
+    }
+  ]}

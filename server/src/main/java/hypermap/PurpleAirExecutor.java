@@ -4,7 +4,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import hypermap.entity.PurpleAirData;
 import hypermap.repository.PurpleAirDataRepository;
 import hypermap.support.PurpleAirAPIResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.*;
 import org.springframework.web.client.RestTemplate;
@@ -16,7 +19,9 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 @Configuration
+@ConfigurationProperties(prefix = "hypermap.purpleair")
 public class PurpleAirExecutor {
+    private static final Logger LOG = LoggerFactory.getLogger(PurpleAirExecutor.class);
     private final ScheduledExecutorService executorService;
     private final String url = "https://api.purpleair.com/v1/sensors?fields=sensor_index,name,last_seen,latitude,longitude,pm2.5,temperature,humidity&nwlat=39.515599616919&nwlng=-83.80692410526318&selat=36.487457065348174&selng=-75.71614098105748";
     private final String apiKey = "F6442F88-3E3A-11EB-9893-42010A8001E8";
@@ -24,6 +29,7 @@ public class PurpleAirExecutor {
     private final HttpHeaders headers;
     private final HttpEntity<?> httpEntity;
     private final ObjectMapper objectMapper;
+    private boolean autoUpdate;
     private PurpleAirDataRepository purpleAirDataRepository;
 
     public PurpleAirExecutor() {
@@ -41,11 +47,15 @@ public class PurpleAirExecutor {
     }
 
     public void scheduleUpdates() {
+        if (!autoUpdate) {
+            LOG.info("AutoUpdate set to false. PurpleAir data not updating.");
+            return;
+        }
         this.executorService.scheduleAtFixedRate(this::fetchPurpleAirData, 0L, 10L, TimeUnit.MINUTES);
     }
 
     private void fetchPurpleAirData() {
-        System.out.println("Updating PurpleAir data...");
+        LOG.info("Updating PurpleAir data...");
         ResponseEntity<PurpleAirAPIResponse> response = restTemplate.exchange(url, HttpMethod.GET, httpEntity, PurpleAirAPIResponse.class);
         if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
             List<String> fields = response.getBody().getFields();
@@ -75,10 +85,11 @@ public class PurpleAirExecutor {
             try {
                 purpleAirDataRepository.saveAll(sensorData);
             } catch (Exception e) {
-                System.out.println("Skipping existing sensors");
+                LOG.error(e.getLocalizedMessage());
+                LOG.info("Skipping existing sensors");
             }
         } else {
-            System.out.println("Failed to fetch");
+            LOG.error("Failed to fetch");
         }
     }
 
@@ -95,5 +106,9 @@ public class PurpleAirExecutor {
             }
             sensor.setCorrectedPM25(Math.round(sensor.getCorrectedPM25() * 100) / 100.0);
         }
+    }
+
+    public void setAutoUpdate(boolean autoUpdate) {
+        this.autoUpdate = autoUpdate;
     }
 }

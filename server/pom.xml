@@ -8,11 +8,11 @@
 		<version>2.3.4.RELEASE</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com.example</groupId>
-	<artifactId>The_sandbox</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
-	<name>The_sandbox</name>
-	<description>Demo project for Spring Boot</description>
+	<groupId>hypermap</groupId>
+	<artifactId>server</artifactId>
+	<version>1.0.0</version>
+	<name>Hypermap Server</name>
+	<description>Server for the Hypermap</description>
 
 	<properties>
 		<java.version>1.8</java.version>
@@ -81,6 +81,15 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-webflux</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-security</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-configuration-processor</artifactId>
+			<optional>true</optional>
 		</dependency>
 	</dependencies>
 
