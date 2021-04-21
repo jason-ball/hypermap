@@ -17,6 +17,7 @@ import Locator from 'esri/tasks/Locator';
 import Graphic from 'esri/Graphic';
 import { Point } from 'esri/geometry';
 import moment from 'moment';
+import { environment } from 'src/environments/environment';
 
 export class PurpleAirLayer {
 
@@ -300,7 +301,7 @@ export class PurpleAirLayer {
     this.purpleAirLayerProperties = {
       // Thanks Lambda, you served us well
       // url: 'https://k5emdaxun6.execute-api.us-east-1.amazonaws.com/dev/purpleair',
-      url: 'http://localhost:5431/api/purpleair/geojson',
+      url: `${environment.serverOrigin}:${environment.serverPort}/api/purpleair/geojson`,
       title: 'PurpleAir Sensors',
       copyright: 'PurpleAir',
       popupTemplate: this.sensorDetailTemplate,

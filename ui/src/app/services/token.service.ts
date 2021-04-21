@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { environment } from 'src/environments/environment';
 import { Token } from '../models/token.model';
 
 @Injectable({
@@ -11,6 +12,6 @@ export class TokenService {
   constructor(private httpClient: HttpClient) { }
 
   getToken(): Observable<Token> {
-    return this.httpClient.get<Token>("http://localhost:5431/api/arcgis-token");
+    return this.httpClient.get<Token>(`${environment.serverOrigin}:${environment.serverPort}/api/arcgis-token`);
   }
 }

@@ -18,6 +18,7 @@ import { PurpleAirService } from '../services/purpleair.service';
 import { PurpleAirLayer } from './PurpleAirLayer';
 import { Point } from 'esri/geometry';
 import { WebMercator } from 'esri/geometry/SpatialReference';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-map',
@@ -38,7 +39,7 @@ export class MapComponent implements OnInit, OnDestroy {
   private _view: MapView = null;
   private layers: Array<any> = [];
   private layerDescriptions: Array<any> = [];
-  private showDetails: boolean = false;
+  showDetails: boolean = false;
   private curDetails: any;
   hypermapMenuItems: MenuItem[];
   private updateTimer: number;
@@ -113,7 +114,7 @@ export class MapComponent implements OnInit, OnDestroy {
     for (const layer of layers) {
       if (layer.type === 'GeoJSON') {
         const newLayer = new GeoJSONLayer({
-          url: `http://localhost:5431${layer.path}`,
+          url: `${environment.serverOrigin}:${environment.serverPort}${layer.path}`,
           title: layer.name,
           visible: false
         });

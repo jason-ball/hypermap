@@ -26,7 +26,6 @@ services:
     # Uncomment this to allow external connections
     ports:
       - "5432:5432"
-      - "8080:8080"
 
   hypermap_server:
     build: ./server
@@ -46,6 +45,14 @@ services:
       - hypermap
     depends_on:
       - hypermap_db
+
+  hypermap_ui:
+    build: ./ui
+    image: hypermap/ui
+    ports:
+      - "8082:80"
+    depends_on:
+      - hypermap_server
 
 volumes:
   dbdata:

@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { environment } from 'src/environments/environment';
 import { PurpleAirChartData } from '../models/PurpleAirChartData.model';
 
 @Injectable({
@@ -11,6 +12,6 @@ export class PurpleAirService {
   constructor(private httpClient: HttpClient) { }
 
   getChartDataForPoint(id: number): Observable<PurpleAirChartData> {
-    return this.httpClient.get<PurpleAirChartData>(`http://localhost:5431/api/purpleair/history/chart/${id}`)
+    return this.httpClient.get<PurpleAirChartData>(`${environment.serverOrigin}:${environment.serverPort}/api/purpleair/history/chart/${id}`)
   }
 }
