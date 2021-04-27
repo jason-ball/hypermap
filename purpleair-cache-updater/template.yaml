@@ -1,0 +1,15 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: 'AWS::Serverless-2016-10-31'
+Description: An AWS Serverless Specification template describing your function.
+Resources:
+  purpleaircacheupdater:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      FunctionName: purpleair-cache-updater
+      Description: ''
+      Handler: index.handler
+      MemorySize: 128
+      Role: >-
+        arn:aws:iam::235834892832:role/service-role/purpleair-cache-updater-role-6otkhvb9
+      Runtime: nodejs12.x
+      Timeout: 3
