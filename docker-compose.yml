@@ -55,7 +55,11 @@ services:
       - hypermap_db
 
   hypermap_ui:
-    build: ./ui
+    build:
+      context: ./ui
+      args:
+        # Changing this option requires rebuilding the container
+        - SERVER_HOST=http://localhost:8081
     image: hypermap/ui
     ports:
       - "8082:80"

@@ -4,8 +4,7 @@
 
 export const environment = {
   production: false,
-  serverOrigin: 'http://localhost',
-  serverPort: 5431
+  serverHost: 'http://localhost:5431',
 };
 
 /*

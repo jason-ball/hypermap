@@ -114,7 +114,7 @@ export class MapComponent implements OnInit, OnDestroy {
     for (const layer of layers) {
       if (layer.type === 'GeoJSON') {
         const newLayer = new GeoJSONLayer({
-          url: `${environment.serverOrigin}:${environment.serverPort}${layer.path}`,
+          url: `${environment.serverHost}${layer.path}`,
           title: layer.name,
           visible: false
         });

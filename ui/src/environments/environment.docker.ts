@@ -1,5 +1,4 @@
 export const environment = {
   production: true,
-  serverOrigin: 'http://localhost',
-  serverPort: 8081
+  serverHost: '<%SERVER_HOST%>',
 };

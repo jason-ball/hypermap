@@ -12,6 +12,6 @@ export class PurpleAirService {
   constructor(private httpClient: HttpClient) { }
 
   getChartDataForPoint(id: number): Observable<PurpleAirChartData> {
-    return this.httpClient.get<PurpleAirChartData>(`${environment.serverOrigin}:${environment.serverPort}/api/purpleair/history/chart/${id}`)
+    return this.httpClient.get<PurpleAirChartData>(`${environment.serverHost}/api/purpleair/history/chart/${id}`)
   }
 }

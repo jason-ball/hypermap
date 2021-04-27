@@ -12,6 +12,6 @@ export class TokenService {
   constructor(private httpClient: HttpClient) { }
 
   getToken(): Observable<Token> {
-    return this.httpClient.get<Token>(`${environment.serverOrigin}:${environment.serverPort}/api/arcgis-token`);
+    return this.httpClient.get<Token>(`${environment.serverHost}/api/arcgis-token`);
   }
 }

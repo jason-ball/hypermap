@@ -301,7 +301,7 @@ export class PurpleAirLayer {
     this.purpleAirLayerProperties = {
       // Thanks Lambda, you served us well
       // url: 'https://k5emdaxun6.execute-api.us-east-1.amazonaws.com/dev/purpleair',
-      url: `${environment.serverOrigin}:${environment.serverPort}/api/purpleair/geojson`,
+      url: `${environment.serverHost}/api/purpleair/geojson`,
       title: 'PurpleAir Sensors',
       copyright: 'PurpleAir',
       popupTemplate: this.sensorDetailTemplate,

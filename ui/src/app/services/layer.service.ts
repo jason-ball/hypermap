@@ -15,15 +15,10 @@ export class LayerService {
 
 
     getLayers(): Observable<Layer[]> {
-        return this.httpClient.get<Layer[]>(`${environment.serverOrigin}:${environment.serverPort}/api/layers`);
+        return this.httpClient.get<Layer[]>(`${environment.serverHost}/api/layers`);
     }
 
     getLayerWithPath(path: string) : Observable<Layer> {
-        return this.httpClient.get<Layer>(`${environment.serverOrigin}:${environment.serverPort}${path}`);
-    }
-
-    createAuthorizationHeader(headers: Headers) {
-        headers.append('Content-Type', 'application/json');
-        headers.append('x-api-key', `B8WaUqiDKn3NGpuN5rWFvKtIPsK1dSG8z83Vvfib`);
+        return this.httpClient.get<Layer>(`${environment.serverHost}${path}`);
     }
 }
