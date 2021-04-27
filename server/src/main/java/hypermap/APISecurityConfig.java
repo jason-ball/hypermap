@@ -33,6 +33,7 @@ public class APISecurityConfig extends WebSecurityConfigurerAdapter {
         apiKeyFilter.setAuthenticationManager(this::verifyAPIKey);
 
         httpSecurity
+                .cors().and()
                 .csrf().disable()
                 .httpBasic().disable()
                 .sessionManagement()

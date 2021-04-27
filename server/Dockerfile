@@ -1,3 +1,8 @@
+#
+# Hypermap Server Dockerfile
+# Jason Ball | Evan Scott | Naomi Steele | Christian Manu
+#
+
 FROM maven:3-openjdk-11 AS build
 WORKDIR /build
 
