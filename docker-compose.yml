@@ -6,7 +6,7 @@
 # NOTE: You may need to increase Docker's memory limit to build the map
 # DO NOT use the new "docker compose" command. Use "docker-compose" (with the hyphen)
 
-version: "3.0"
+version: "3.8"
 services:
   # This service can be removed if another database service is used (e.g., AWS RDS)
   hypermap_db:
